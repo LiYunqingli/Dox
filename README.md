@@ -105,4 +105,4 @@ python main.py -r "cd /; ls; pwd"
 
 <!-- 输入 donghua 命令体验特殊动画效果（开发者预留惊喜） -->
 <!-- 加粗donghua -->
-输入 <span style="font-weight: bold;">donghua</span> 命令体验特殊动画效果（开发者预留惊喜）
+输入 ```donghua``` 命令体验特殊动画效果（开发者预留惊喜）
