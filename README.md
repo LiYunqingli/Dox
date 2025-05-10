@@ -80,3 +80,29 @@ python main.py -r "cd /; ls; pwd"
   }
 }
 ```
+
+## 🛠️ 开发与贡献
+
+欢迎提交 Pull Request 或 Issue，共同改进项目。请遵循以下步骤：
+
+1. Fork 本仓库
+2. 创建功能分支 (git checkout -b feature/your-feature)
+3. 提交修改 (git commit -m 'Add some feature')
+4. 推送到分支 (git push origin feature/your-feature)
+5. 创建 Pull Request
+
+代码规范：
+
+- 使用 Google Python 风格指南
+- 新增功能需添加对应单元测试
+- 修改语言文件需同步更新中英文版本
+
+## 📜 许可证
+
+本项目遵循 MIT 许可证。请查看 LICENSE 文件了解更多信息。
+
+## 🎮 彩蛋功能
+
+<!-- 输入 donghua 命令体验特殊动画效果（开发者预留惊喜） -->
+<!-- 加粗donghua -->
+输入 <span style="font-weight: bold;">donghua</span> 命令体验特殊动画效果（开发者预留惊喜）
