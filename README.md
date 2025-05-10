@@ -59,15 +59,15 @@ python main.py -r "cd /; ls; pwd"
 
 | 命令 | 描述 | 使用示例 |
 | --- | --- | --- |
-| help | 显示帮助信息 | help ls |
-| cd | 切换工作目录 | cd ../ |
-| ls | 列出目录内容 | ls -l (详细模式) |
-| ll | 同 ls -l | ll |
-| pwd | 显示当前路径 | pwd |
-| clear | 清空屏幕 | clear |
-| version | 显示版本信息 | version |
-| video | 播放视频 | video test (测试视频) |
-| exit | 退出程序 | exit |
+| ```help``` | 显示帮助信息 | help ls |
+| ```cd``` | 切换工作目录 | cd ../ |
+| ```ls``` | 列出目录内容 | ls -l (详细模式) |
+| ```ll``` | 同 ls -l | ll |
+| ```pwd``` | 显示当前路径 | pwd |
+| ```clear``` | 清空屏幕 | clear |
+| ```version``` | 显示版本信息 | version |
+| ```video``` | 播放视频 | video test (测试视频) |
+| ```exit``` | 退出程序 | exit |
 
 ## 🌍 多语言支持
 
