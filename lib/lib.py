@@ -248,9 +248,29 @@ def video(path):
             video_in_cmd(path)
 
 #软件包管理器
-def install():
-    print("软件包管理器")
-
+def pck(input_str):
+    items = input_str.split()[1:] # 去除命令本身
+    if len(items) == 0:
+        _print("pck需要携带参数\n")
+    else:
+        if items[0] == "install":
+            items = items[1:]
+            from lib.src.pck import pck_install
+            if len(items) == 0:
+                _print("pck install需要携带package\n")
+            elif "-y" in items:
+                items.remove("-y")
+                pck_install(items, False)
+            else:
+                #询问安装
+                pck_install(items, True)
+        elif items[0] == "update":
+            from lib.src.pck import pck_update
+            items = items[1:]
+            if len(items) != 0:
+                _print("pck update不需要携带参数\n")
+            else:
+                pck_update()
 # 处理交互命令
 def command(input_str):
     input_list = input_str.split()
@@ -284,5 +304,7 @@ def command(input_str):
             video(input_list[1])
         else:
             _print("_13_\n", "red")
+    elif command.lower() == "pck":
+        pck(input_str)
     else:
         _print("_2_" + command + "\n")

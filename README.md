@@ -124,6 +124,9 @@ python main.py -r "cd /; ls; pwd"
 ### 🔜 未来规划
 **包管理 (pck)** 🚧
 - [ ] `pck install` - 安装Dox生态软件包
+- [ ] `pck remove` - 卸载Dox生态软件包
+- [ ] `pck list` - 列出已安装的Dox生态软件包
+- [ ] `pck install package -y` - 忽略确认安装
 - [ ] `pck search` - 搜索可用软件包
 - [ ] `pck update` - 更新本地软件仓库
 - [ ] `pck build` - 创建自定义软件包

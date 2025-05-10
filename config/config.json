@@ -4,6 +4,10 @@
         "Time": "2025.4.26 16:58:07"
     },
     "Config":{
-        "Lang" : "zh-CN"
+        "Lang" : "zh-CN",
+        "Pck" : {
+            "Name" : "Dox_pck_server",
+            "Addr" : "http://127.0.0.1:8081/"
+        }
     }
 }
