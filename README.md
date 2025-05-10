@@ -24,12 +24,10 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/dox-terminal.git
-cd dox-terminal
-
+git clone https://gitea.lihuarong.cn:8080/LiHuarong/Dox.git
+cd Dox
 # 安装依赖
 pip install -r requirements.txt
-
 # 运行程序
 python main.py
 
@@ -50,7 +48,6 @@ Documents >> ls -l
 ```bash
 # 单命令模式
 python main.py ls -l
-
 # 批量命令模式
 python main.py -r "cd /; ls; pwd"
 ```
@@ -93,9 +90,11 @@ python main.py -r "cd /; ls; pwd"
 
 代码规范：
 
-- 使用 Google Python 风格指南
+- 清晰的目录架构，核心功能和附加功能分开不同的文件封装
 - 新增功能需添加对应单元测试
 - 修改语言文件需同步更新中英文版本
+- 代码注释清晰，便于他人理解和维护
+- config.json 文件中新增配置项需添加注释说明
 
 ## 📜 许可证
 
