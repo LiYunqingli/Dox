@@ -108,71 +108,46 @@ python main.py -r "cd /; ls; pwd"
 ## 🛠️ 功能路线图
 
 ### ✅ 已实现功能
-**Core Features**
+
+**核心功能**
 - [x] 类Linux文件系统操作（ls/cd/pwd）
 - [x] 多语言支持系统（中/英文）
 - [x] 终端彩色输出系统
 - [x] 批处理命令模式（-r参数）
 - [x] 控制台视频播放器（ASCII渲染）
 
-**Advanced**
+**先进的**
 - [x] Windows/Linux/macOS多平台适配
 - [x] 动态路径自动补全
 - [x] 权限错误处理机制
 - [x] 安全命令沙箱环境
 
 ### 🔜 未来规划
-**Package Management (pck)** 🚧
+**包管理 (pck)** 🚧
 - [ ] `pck install` - 安装Dox生态软件包
 - [ ] `pck search` - 搜索可用软件包
 - [ ] `pck update` - 更新本地软件仓库
 - [ ] `pck build` - 创建自定义软件包
 
-**Extension System**
+**扩展插件**
 - [ ] 插件热加载框架
 - [ ] 官方软件包市场
 - [ ] 沙箱化插件运行时
 - [ ] 插件签名验证系统
 
-**Terminal Enhancement**
-- [ ] SSH客户端集成
-- [ ] 支持Zsh/PowerShell语法
+**终端增强**
+- [ ] 客户端局域网集成
 - [ ] 终端主题商店（配色方案）
 - [ ] ASCII艺术生成器
-- [ ] 实时系统监控仪表盘
 
-**AI Integration**
-- [ ] `ask` - 终端AI助手（本地LLM）
-- [ ] 智能命令预测
-- [ ] 自然语言转命令
-- [ ] 异常诊断专家系统
-
-**Gaming & Fun** 🎮
+**游戏 & 娱乐** 🎮
 - [ ] 终端贪吃蛇游戏
-- [ ] 文字冒险游戏引擎
-- [ ] 加密货币行情TUI
 - [ ] 每日开发者彩蛋
 
-**DevOps Tools**
+**DevOps工具**
 - [ ] 内置HTTP服务器
-- [ ] 文件差异对比工具
-- [ ] Markdown实时预览
-- [ ] Docker集成模块
+- [ ] 开发者常用工具
 
-**Security**
+**安全**
 - [ ] 操作审计日志
-- [ ] 生物认证支持（指纹/人脸）
 - [ ] 加密文件保险箱
-- [ ] 网络流量监控
-
-📌 **Version 2.0 Milestone**
-```mermaid
-gantt
-    title 版本里程碑
-    dateFormat  YYYY-MM-DD
-    section 核心功能
-    包管理系统       :active,  des1, 2024-09-01, 2024-12-31
-    插件架构         :         des2, 2025-01-01, 2025-03-31
-    section 体验升级
-    AI助手集成      :         des3, 2025-04-01, 2025-06-30
-    游戏引擎        :         des4, 2025-07-01, 2025-09-30
