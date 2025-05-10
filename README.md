@@ -1,4 +1,4 @@
-# Dox Terminal Tool
+# Dox 终端工具
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python Version](https://img.shields.io/badge/python-3.7%2B-green.svg)
