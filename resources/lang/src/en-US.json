@@ -1,0 +1,103 @@
+{
+    "about": {
+        "version": "0.0.1",
+        "author": "Yunqingli",
+        "date": "2025.4.26 16:54:52"
+    },
+    "msg": {
+        "0": "Welcome to Dox python ",
+        "1": "This version was released by @Yunqingli at 16:54:52 on May 26, 2025",
+        "2": "Unknown command: ",
+        "3": "No help found for ",
+        "4": "Directory does not exist",
+        "5": "Not a valid directory",
+        "6": "Permission denied",
+        "7": "Error: ",
+        "8": "Please enter directory path",
+        "9": "Unable to obtain information:",
+        "10": "Error: -r requires a command string separated by ';'",
+        "11": "Error: Unable to pass the exit command in command-line mode, this command is only valid in interactive mode.",
+        "12": "For detailed information about a command, please type the name of the HELP command",
+        "13": "Please enter the correct parameters. If assistance is needed, please enter 'help' or 'help [command]'"
+    },
+    "help": [
+        {
+            "name": "ARGV",
+            "msg": "argv\t(Execute command line parameters)",
+            "usage": {
+                "[current instance] [command]": "Console runs the current executable file with parameters passed in, executes a single command but does not start interactive mode",
+                "[current instance] -r \"[command1];[command2];...\"": "The console runs the current executable file with the parameter - r, sequentially traverses and executes the incoming commands, executes multiple commands without starting interactive mode"
+            }
+        },
+        {
+            "name": "CD",
+            "msg": "cd\t(change directory)",
+            "usage": {
+                "cd [directory path]": "Change to the specified directory",
+                "cd ../": "Change to the parent directory",
+                "cd /": "Change to root directory",
+                "cd drive:": "Switch to specified drive (Windows only)"
+            }
+        },
+        {
+            "name": "CLEAR",
+            "msg": "clear\t(clear screen)",
+            "usage": {
+                "clear": "Clear the screen directly"
+            }
+        },
+        {
+            "name": "EXIT",
+            "msg": "exit\t(exit program)",
+            "usage": {
+                "exit": "Exit the program directly",
+                "exit -f": "Force exit the program"
+            }
+        },
+        {
+            "name": "HELP",
+            "msg": "help\t(print help information)",
+            "usage": {
+                "help": "Show detailed information about all commands",
+                "help [command]": "Show detailed information about specific command"
+            }
+        },
+        {
+            "name": "LS",
+            "msg": "ls\t(list directory contents)",
+            "usage": {
+                "ls": "List files in current directory",
+                "ls -l": "List files in detail"
+            }
+        },
+        {
+            "name": "LL",
+            "msg": "ll\t(list directory contents)",
+            "usage": {
+                "ll": "List files in detail (same as ls -l)"
+            }
+        },
+        {
+            "name": "PWD",
+            "msg": "pwd\t(print working directory)",
+            "usage": {
+                "pwd": "Show current directory path"
+            }
+        },
+        {
+            "name": "VERSION",
+            "msg": "version\t(show version information)",
+            "usage": {
+                "version": "Display version number and release date"
+            }
+        },
+        {
+            "name": "VIDEO",
+            "msg": "video\t(play video in console)",
+            "usage": {
+                "video test": "Test video playback",
+                "video [absolute video path]": "Play specified video"
+            }
+        }
+    ]
+}

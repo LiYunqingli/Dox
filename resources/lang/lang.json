@@ -1,0 +1,10 @@
+{
+    "zh-CN": {
+        "Path" : "./src/zh-CN.json",
+        "Language" : "简体中文"
+    },
+    "en-US": {
+        "Path" : "./src/en-US.json",
+        "Language" : "English"
+    }
+}
