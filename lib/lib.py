@@ -271,6 +271,25 @@ def pck(input_str):
                 _print("pck update不需要携带参数\n")
             else:
                 pck_update()
+
+#下载文件
+def download(file_url, file_path):
+    # 使用requests库下载文件，如果成功返回true，失败返回false
+    _print("正在下载文件\n")
+    import requests
+    try:
+        r = requests.get(file_url, stream=True)
+        with open(file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        _print("下载完成\n")
+        print("保存路径：" + file_path)
+        return True
+    except:
+        _print("下载失败\n")
+        return False
+
 # 处理交互命令
 def command(input_str):
     input_list = input_str.split()

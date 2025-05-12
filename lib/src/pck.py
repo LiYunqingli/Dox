@@ -1,5 +1,4 @@
-from lib.lib import _print
-from lib.lib import get_config
+from lib.lib import _print, get_config, get_run_path, download
 
 
 #pck软件包管理器
@@ -25,4 +24,44 @@ def pck_update():
     
     _print("Connecting  " + pckName + "  " + pckAddr + "\n")
     
-    
+    import subprocess
+    # 简单校验合法性以及服务器连通性（特定目录文件是否存在）
+    test_result = subprocess.run(
+        ["curl", "-s", f"{pckAddr}/metadata/lastes/version"],
+        capture_output=True,
+        text=True,
+    )
+
+    if test_result.returncode == 0:
+        _print("_14_\n", "green")
+        #服务器可到达
+        dox_version = config["About"]["Version"]
+        releaseFile = f"{pckAddr}/metadata/{dox_version}/Release.json"
+        dox_version_result = subprocess.run(
+            ["curl", "-s", releaseFile],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
+        if dox_version_result.returncode == 0:
+            _print("远程服务器中找到了\n")
+            #下载Release.json
+            
+            #当前目录位置获取
+            run_path = get_run_path()
+            #下载Release.json
+            if download(releaseFile, run_path + "/../downloads//Release.json"):
+                pass
+            else:
+                _print("下载Release.json失败\n")
+                return False
+
+
+        else:
+            _print("你的dox版本不受支持，pck无法找到对应的版本依赖\n")
+            pass
+
+        
+    else:
+        _print("_15_\n", "red")

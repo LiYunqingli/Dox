@@ -18,7 +18,9 @@
         "10": "Error: -r requires a command string separated by ';'",
         "11": "Error: Unable to pass the exit command in command-line mode, this command is only valid in interactive mode.",
         "12": "For detailed information about a command, please type the name of the HELP command",
-        "13": "Please enter the correct parameters. If assistance is needed, please enter 'help' or 'help [command]'"
+        "13": "Please enter the correct parameters. If assistance is needed, please enter 'help' or 'help [command]'",
+        "14": "Server reachable",
+        "15": "Server not reachable"
     },
     "help": [
         {

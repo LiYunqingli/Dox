@@ -2,7 +2,7 @@
 Create at 2025.4.26 16:54:52 from Mr.LiHuarong
 """
 
-from lib.lib import load, _print, command
+from lib.lib import load, _print, command, clear
 import os
 import sys
 
@@ -42,6 +42,7 @@ if __name__ == '__main__':
     
     # 交互模式（无参数时）
     
+    clear()
     load()
     while True:
         userPath = os.getcwd()
