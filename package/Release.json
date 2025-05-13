@@ -1,0 +1,15 @@
+{
+    "version": "0.0.1",
+    "update": "2025.5.7 10:02:18",
+    "apps": {
+        "德育分导出": {
+            "version": "0.0.1",
+            "compatibility": {
+                "oldest": "0.0.1",
+                "latest": "1.0.0"
+            },
+            "name" : "德育分导出",
+            "package" : "DeyufenDaochu_0.0.1_test.zip"
+        }
+    }
+}

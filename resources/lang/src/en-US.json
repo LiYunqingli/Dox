@@ -20,7 +20,11 @@
         "12": "For detailed information about a command, please type the name of the HELP command",
         "13": "Please enter the correct parameters. If assistance is needed, please enter 'help' or 'help [command]'",
         "14": "Server reachable",
-        "15": "Server not reachable"
+        "15": "Server not reachable",
+        "16": "PCK Manager requires at least one parameter",
+        "17": "pck install requires you to provide one or more package names",
+        "18": "pck usage error",
+        "19": "Illegal PCK parameters: "
     },
     "help": [
         {

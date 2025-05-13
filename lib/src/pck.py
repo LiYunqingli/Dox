@@ -51,10 +51,10 @@ def pck_update():
             #当前目录位置获取
             run_path = get_run_path()
             #下载Release.json
-            if download(releaseFile, run_path + "/../downloads/Release.json"):
-                _print("获取软件包数据成功\n", "green")
+            if download(releaseFile, run_path + "/../package/Release.json"):
+                _print("软件包数据更新成功\n", "green")
             else:
-                _print("软件包获取失败\n", "red")
+                _print("软件包更新失败\n", "red")
                 return False
 
 
@@ -65,3 +65,7 @@ def pck_update():
         
     else:
         _print("_15_\n", "red")
+
+# 展示元数据中可用package
+def pck_list():
+    print("当前显示pck可用的列表")

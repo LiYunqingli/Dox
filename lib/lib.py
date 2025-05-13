@@ -251,13 +251,13 @@ def video(path):
 def pck(input_str):
     items = input_str.split()[1:] # 去除命令本身
     if len(items) == 0:
-        _print("pck需要携带参数\n")
+        _print("_16_\n")#至少需要一个参数
     else:
         if items[0] == "install":
             items = items[1:]
             from lib.src.pck import pck_install
             if len(items) == 0:
-                _print("pck install需要携带package\n")
+                _print("_17_\n")#最少需要一个包名
             elif "-y" in items:
                 items.remove("-y")
                 pck_install(items, False)
@@ -268,9 +268,67 @@ def pck(input_str):
             from lib.src.pck import pck_update
             items = items[1:]
             if len(items) != 0:
-                _print("pck update不需要携带参数\n")
+                _print("_18_\n")#pck update 用法错误（携带参数非法）
             else:
                 pck_update()
+        elif items[0] == "list":
+            from lib.src.pck import pck_list
+            items = items[1:]
+            if len(items) != 0:
+                _print("_18_\n")
+            else:
+                pck_list()
+        else:
+            _print("_19_" + items[0] + "\n") #非法的pck参数
+
+# rm 删除陌路或者文件
+def rm(paths, recursive=False, force=False):
+    """删除文件或目录
+    Args:
+        paths (list): 要删除的文件/目录路径列表
+        recursive (bool): 是否递归删除目录
+        force (bool): 是否强制删除（无确认）
+    """
+    import os
+    import shutil
+    for path in paths:
+        # 检查路径是否存在
+        if not os.path.exists(path):
+            if not force:
+                _print(f"_20_{path}\n", "red")  # 文件或目录不存在
+            continue  # 强制模式下忽略不存在的文件
+        # 删除文件
+        if os.path.isfile(path):
+            try:
+                if not force:
+                    _print(f"_22_{path}\n","yellow")  # 确认删除文件
+                    confirm = input().strip().lower()
+                    if confirm != 'y':
+                        _print("_24_\n")  # 取消删除
+                        continue
+                os.remove(path)
+                _print(f"_21_{path}\n")  # 成功删除文件
+            except Exception as e:
+                _print(f"_29_{path}: {str(e)}\n", "red")  # 删除失败
+        # 删除目录
+        elif os.path.isdir(path):
+            if not recursive:
+                _print("_25_\n", "red")  # 需要-r参数
+                continue
+            try:
+                if not force:
+                    _print(f"_27_{path}\n","yellow")  # 确认删除目录
+                    confirm = input().strip().lower()
+                    if confirm != 'y':
+                        _print("_24_\n")
+                        continue
+                shutil.rmtree(path, ignore_errors=force)  # 强制模式下忽略错误
+                _print(f"_26_{path}\n")  # 成功删除目录
+            except Exception as e:
+                if not force:
+                    _print(f"_29_{path}: {str(e)}\n", "red")
+        else:
+            _print(f"_28_{path}\n", "red")  # 未知类型
 
 #下载文件(高级版本，支持动态显示下载过程，不支持断点续传)
 def download(file_url, file_path):
@@ -388,5 +446,27 @@ def command(input_str):
         file_url = input_list[1]
         file_path = input_list[2]
         download(file_url, file_path)
+    elif command.lower() == "rm":
+        items = input_list[1:]  # 去除命令本身
+        if not items:
+            _print("_30_\n", "red")  # 缺少参数
+            return
+        recursive = False
+        force = False
+        paths = []
+        # 解析参数
+        for item in items:
+            if item.startswith('-'):
+                if 'r' in item or 'R' in item:
+                    recursive = True
+                if 'f' in item:
+                    force = True
+            else:
+                paths.append(item)
+        if not paths:
+            _print("_31_\n", "red")  # 未指定文件或目录
+            return
+        # 调用rm函数
+        rm(paths, recursive, force)
     else:
         _print("_2_" + command + "\n")
