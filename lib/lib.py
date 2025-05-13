@@ -272,22 +272,81 @@ def pck(input_str):
             else:
                 pck_update()
 
-#下载文件
+#下载文件(高级版本，支持动态显示下载过程，不支持断点续传)
 def download(file_url, file_path):
-    # 使用requests库下载文件，如果成功返回true，失败返回false
-    _print("正在下载文件\n")
     import requests
+    import os
+    import time
+
+    COLORS = {
+        "black": "\033[30m",
+        "red": "\033[31m",
+        "green": "\033[32m",
+        "yellow": "\033[33m",
+        "blue": "\033[34m",
+        "magenta": "\033[35m",
+        "cyan": "\033[36m",
+        "white": "\033[37m",
+        "reset": "\033[0m",
+        "bold": "\033[1m",
+        "underline": "\033[4m",
+    }
+
+    def human_readable_size(size_bytes):
+        if size_bytes <= 0:
+            return "0B"
+        units = ['B', 'KB', 'MB', 'GB', 'TB']
+        unit_index = 0
+        size = size_bytes
+        while size >= 1024 and unit_index < len(units) - 1:
+            size /= 1024
+            unit_index += 1
+        return f"{size:.2f} {units[unit_index]}"
+
+    def format_time(seconds):
+        seconds = int(seconds)
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = seconds % 60
+        if hours > 0:
+            return f"{hours}:{minutes:02d}:{seconds:02d}"
+        else:
+            return f"{minutes:02d}:{seconds:02d}"
+
     try:
         r = requests.get(file_url, stream=True)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        total_size = int(r.headers.get('Content-Length', 0))
+        downloaded = 0
+        start_time = time.time()
         with open(file_path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
-        _print("下载完成\n")
-        print("保存路径：" + file_path)
+                    downloaded += len(chunk)
+                    elapsed_time = time.time() - start_time
+                    speed = downloaded / elapsed_time if elapsed_time > 0 else 0
+                    human_downloaded = human_readable_size(downloaded)
+                    speed_h = human_readable_size(speed) + "/s"
+                    time_str = format_time(elapsed_time)
+                    if total_size > 0:
+                        percent = downloaded / total_size * 100
+                        progress_width = 20
+                        filled = int(progress_width * percent / 100)
+                        bar = '=' * filled + '>' + ' ' * (progress_width - filled - 1) if filled < progress_width else '=' * progress_width
+                        human_total = human_readable_size(total_size)
+                        remaining_time = (total_size - downloaded) / speed if speed > 0 else 0
+                        eta_str = format_time(remaining_time) if speed > 0 else '--:--'
+                        progress_line = f"\r{percent:.1f}% [{bar}] {human_downloaded}/{human_total} {speed_h} Time: {time_str} ETA: {eta_str}"
+                    else:
+                        progress_line = f"\rDownloaded: {human_downloaded} at {speed_h} Time: {time_str}"
+                    color_code = COLORS['green']
+                    reset_code = COLORS['reset']
+                    print(f"{color_code}{progress_line}{reset_code}", end='', flush=True)
+            print(f"{COLORS['reset']}\n", end='')
         return True
-    except:
-        _print("下载失败\n")
+    except Exception as e:
+        _print(f"download() : {str(e)}\n", color="red")
         return False
 
 # 处理交互命令
@@ -325,5 +384,9 @@ def command(input_str):
             _print("_13_\n", "red")
     elif command.lower() == "pck":
         pck(input_str)
+    elif command.lower() == "download":
+        file_url = input_list[1]
+        file_path = input_list[2]
+        download(file_url, file_path)
     else:
         _print("_2_" + command + "\n")
