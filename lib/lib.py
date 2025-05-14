@@ -30,7 +30,7 @@ def get_lang():
     return lang
 
 #基于print的封装，根据本地语言设置输出对应语言的信息
-def _print(input_str="\n", color=None):
+def _print(input_str="\n", color=None, items=[]):
     import json
     import re
     
@@ -62,6 +62,10 @@ def _print(input_str="\n", color=None):
             key = match.group(1)
             return lang_data.get(key, match.group(0))
         output_str = pattern.sub(replace_match, input_str)
+
+        #现在格式化其中的%s，按照顺序讲items中的值替换进去
+        output_str = output_str % tuple(items)
+
         print(f"{color_code}{output_str}{reset_code}", end='')
     except FileNotFoundError:
         print(f"Error: Language file not found at {lang_file_path}")
@@ -295,21 +299,21 @@ def rm(paths, recursive=False, force=False):
         # 检查路径是否存在
         if not os.path.exists(path):
             if not force:
-                _print(f"_20_{path}\n", "red")  # 文件或目录不存在
+                _print("_20_\n", "red", [path])  # 文件或目录不存在
             continue  # 强制模式下忽略不存在的文件
         # 删除文件
         if os.path.isfile(path):
             try:
                 if not force:
-                    _print(f"_22_{path}\n","yellow")  # 确认删除文件
+                    _print("_22_\n", "yellow", [path])  # 确认删除文件
                     confirm = input().strip().lower()
                     if confirm != 'y':
                         _print("_24_\n")  # 取消删除
                         continue
                 os.remove(path)
-                _print(f"_21_{path}\n")  # 成功删除文件
+                _print("_21_\n", items=[path])  # 成功删除文件
             except Exception as e:
-                _print(f"_29_{path}: {str(e)}\n", "red")  # 删除失败
+                _print(f"_29_: {str(e)}\n", "red", [path])  # 删除失败
         # 删除目录
         elif os.path.isdir(path):
             if not recursive:
@@ -317,18 +321,18 @@ def rm(paths, recursive=False, force=False):
                 continue
             try:
                 if not force:
-                    _print(f"_27_{path}\n","yellow")  # 确认删除目录
+                    _print("_27_\n","yellow",[path])  # 确认删除目录
                     confirm = input().strip().lower()
                     if confirm != 'y':
                         _print("_24_\n")
                         continue
                 shutil.rmtree(path, ignore_errors=force)  # 强制模式下忽略错误
-                _print(f"_26_{path}\n")  # 成功删除目录
+                _print("_26_\n", items=[path])  # 成功删除目录
             except Exception as e:
                 if not force:
-                    _print(f"_29_{path}: {str(e)}\n", "red")
+                    _print(f"_29_: {str(e)}\n", "red", [path])
         else:
-            _print(f"_28_{path}\n", "red")  # 未知类型
+            _print("_28_\n", "red", [path])  # 未知类型
 
 #下载文件(高级版本，支持动态显示下载过程，不支持断点续传)
 def download(file_url, file_path):

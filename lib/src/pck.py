@@ -5,13 +5,20 @@ from lib.lib import _print, get_config, get_run_path, download
 
 # 安装软件包，packages为数组，保存所有需要安装的软件包，ask为True是询问是否安装，为False是直接安装
 def pck_install(packages, ask=True):
-    print(str(packages))
+    print("pck list: " + str(packages))
+
+    def install_packages(packages):
+        for package in packages:
+            _print("正在安装" + package + "\n")
+
     if ask:
-        # 查询本地
-        pass
+        _print("_32_")
+        if input() == "y":
+            for package in packages:
+                _print("正在安装" + package)
     else:
         for package in packages:
-            print("正在安装" + package)
+            _print("正在安装" + package)
 
 # 软件包依赖关系元数据更新
 def pck_update():
@@ -68,4 +75,14 @@ def pck_update():
 
 # 展示元数据中可用package
 def pck_list():
-    print("当前显示pck可用的列表")
+    import os, json
+    releaseFile = get_run_path() + "/../package/Release.json"
+
+    if os.path.exists(releaseFile):
+        with open(releaseFile, "r", encoding="utf-8") as f:
+            release = json.load(f)
+            _print("可用的软件包\n")
+            for package in release["apps"]:
+                print(package['name'] + "\t" + package['version'])
+    else:
+        print("Release.json不存在", "red")
