@@ -44,15 +44,19 @@ if __name__ == '__main__':
     
     clear()
     load()
-    while True:
-        try:
-            userPath = os.getcwd()
-            _print(userPath + ">>")
-            input_str = input()
-            if input_str.lower() == "exit":
-                print("exit")
-                sys.exit()
-            command(input_str)
-        except KeyboardInterrupt:
-            print("^C")  # 处理换行，使提示符出现在新行
-            continue
+    try:
+        while True:
+            try:
+                userPath = os.getcwd()
+                _print(userPath + ">>")
+                input_str = input()
+                if input_str.lower() == "exit":
+                    print("exit")
+                    sys.exit()
+                command(input_str)
+            except KeyboardInterrupt:
+                print("^C")  # 处理换行，使提示符出现在新行
+                continue
+    except Exception as e:
+        _print(f"Error: {e}\n", "red")
+        input("警告：程序出现错误，抱歉您的工作区无法恢复，按任意键退出程序...")
