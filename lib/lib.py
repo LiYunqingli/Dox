@@ -288,7 +288,7 @@ def pck(input_str):
                 _print("_33_\n")
             else:
                 from lib.src.pck import pck_search
-                pck_search(items[0])
+                pck_search(items[0], isOutPut=True)
         else:
             _print("_19_" + items[0] + "\n") #非法的pck参数
 

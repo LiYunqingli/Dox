@@ -4,7 +4,7 @@ from lib.lib import _print, get_config, get_run_path, download
 #pck软件包管理器
 
 # 查找软件包
-def pck_search(packageName):
+def pck_search(packageName, isOutPut=False):
     import os, json
     releaseFile = get_run_path() + "/../package/Release.json"
 
@@ -14,10 +14,15 @@ def pck_search(packageName):
             apps = release["apps"]
             for app in apps:
                 if app["name"] == packageName:
+                    if isOutPut:
+                        #格式化json到字符串
+                        _print(json.dumps(app, indent=4, ensure_ascii=False) + "\n", "green")
+                        # _print(str(app), "green")
                     return app
                 else:
                     continue
-            _print("未找到软件包\n", "red")#暂时输出
+            if isOutPut:
+                _print("没有找到软件包：'" + packageName + "'\n", "red")
             return None # 没有找到
     else:
         print("Release.json不存在", "red")
