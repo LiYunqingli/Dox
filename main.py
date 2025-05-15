@@ -45,10 +45,14 @@ if __name__ == '__main__':
     clear()
     load()
     while True:
-        userPath = os.getcwd()
-        _print(userPath + ">>")
-        input_str = input()
-        if input_str.lower() == "exit":
-            print("exit")
-            break
-        command(input_str)
+        try:
+            userPath = os.getcwd()
+            _print(userPath + ">>")
+            input_str = input()
+            if input_str.lower() == "exit":
+                print("exit")
+                sys.exit()
+            command(input_str)
+        except KeyboardInterrupt:
+            print("^C")  # 处理换行，使提示符出现在新行
+            continue
