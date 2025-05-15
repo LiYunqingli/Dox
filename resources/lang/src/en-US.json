@@ -22,7 +22,7 @@
         "14": "Server reachable",
         "15": "Server not reachable",
         "16": "PCK Manager requires at least one parameter",
-        "17": "pck install requires you to provide one or more package names",
+        "17": "requires you to provide one or more package names",
         "18": "pck usage error",
         "19": "Illegal PCK parameters: ",
         "20": "Error: The file or directory '%s' does not exist",
