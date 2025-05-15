@@ -282,6 +282,13 @@ def pck(input_str):
                 _print("_18_\n")
             else:
                 pck_list()
+        elif items[0] == "search":
+            items = items[1:]
+            if len(items) == 0:
+                _print("_33_\n")
+            else:
+                from lib.src.pck import pck_search
+                pck_search(items[0])
         else:
             _print("_19_" + items[0] + "\n") #非法的pck参数
 
