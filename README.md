@@ -123,24 +123,24 @@ python main.py -r "cd /; ls; pwd"
 
 ### 🔜 未来规划
 **包管理 (pck)** 🚧
-- [ ] `pck install` - 安装Dox生态软件包
+- [x] `pck install` - 安装Dox生态软件包
 - [ ] `pck remove` - 卸载Dox生态软件包
-- [ ] `pck list` - 列出已安装的Dox生态软件包
-- [ ] `pck install package -y` - 忽略确认安装
-- [ ] `pck search` - 搜索可用软件包
-- [ ] `pck update` - 更新本地软件仓库
+- [x] `pck list` - 列出已安装的Dox生态软件包
+- [x] `pck install package -y` - 忽略确认安装
+- [x] `pck search` - 搜索可用软件包
+- [x] `pck update` - 更新本地软件仓库
 - [ ] `pck build` - 创建自定义软件包
 
 **扩展插件**
 - [ ] 插件热加载框架
-- [ ] 官方软件包市场
+- [x] 官方软件包市场
 - [ ] 沙箱化插件运行时
 - [ ] 插件签名验证系统
 
 **终端增强**
 - [ ] 客户端局域网集成
 - [ ] 终端主题商店（配色方案）
-- [ ] ASCII艺术生成器
+- [x] ASCII艺术生成器
 
 **游戏 & 娱乐** 🎮
 - [ ] 终端贪吃蛇游戏
@@ -152,4 +152,4 @@ python main.py -r "cd /; ls; pwd"
 
 **安全**
 - [ ] 操作审计日志
-- [ ] 加密文件保险箱
+- [x] 加密文件保险箱
