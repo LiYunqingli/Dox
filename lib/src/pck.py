@@ -127,4 +127,4 @@ def pck_list():
             for package in release["apps"]:
                 print(package['name'] + "\t" + package['version'])
     else:
-        print("Release.json不存在", "red")
+        _print("Release.json不存在", "red")
