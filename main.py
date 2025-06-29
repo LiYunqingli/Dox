@@ -42,7 +42,7 @@ if __name__ == '__main__':
     
     # 交互模式（无参数时）
     
-    clear()
+    # clear()
     load()
     try:
         while True:
