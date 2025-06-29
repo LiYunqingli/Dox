@@ -479,5 +479,15 @@ def command(input_str):
             return
         # 调用rm函数
         rm(paths, recursive, force)
+    elif command.lower() == "bookmark":
+        bookmark(input_str)
     else:
         _print("_2_" + command + "\n")
+        
+# 书签（变量）
+def bookmark(input_str):
+    items = input_str.split()[1:] # 去除命令本身
+    if len(items) == 0:
+        _print("至少需要一个参数来操作书签\n")
+    else:
+        print(items[0])
