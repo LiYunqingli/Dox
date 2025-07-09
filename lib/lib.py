@@ -292,6 +292,10 @@ def pck(input_str):
         else:
             _print("_19_" + items[0] + "\n") #非法的pck参数
 
+def set_config(input_str):
+    _print("设置配置文件")
+    pass
+
 # rm 删除陌路或者文件
 def rm(paths, recursive=False, force=False):
     """删除文件或目录
@@ -389,7 +393,7 @@ def download(file_url, file_path):
         downloaded = 0
         start_time = time.time()
         with open(file_path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
+            for chunk in r.iter_content(chunk_size=8):
                 if chunk:
                     f.write(chunk)
                     downloaded += len(chunk)
@@ -481,6 +485,8 @@ def command(input_str):
         rm(paths, recursive, force)
     elif command.lower() == "bookmark":
         bookmark(input_str)
+    elif command.lower() == "set":
+        set_config(input_str)
     else:
         _print("_2_" + command + "\n")
         
