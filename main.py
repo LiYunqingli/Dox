@@ -2,7 +2,7 @@
 Create at 2025.4.26 16:54:52 from Mr.LiHuarong
 """
 
-from lib.lib import load, _print, command#, clear
+from lib.lib import load, _print, command#,  clear
 import os
 import sys
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 userPath = os.getcwd()
                 base_name = os.path.basename(userPath) #只显示当前目录名
                 if base_name == "":
-                    base_name = "/"
+                    base_name = "/" #如果当前目录为根目录，则显示为"/" 注意需要考虑windows下的兼容性（目前仅考虑Ubuntu）
                 _print("Dox:" + base_name + ">>")
                 input_str = input()
                 if input_str.lower() == "exit":
