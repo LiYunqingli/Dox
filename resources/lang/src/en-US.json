@@ -115,7 +115,13 @@
             "msg": "video\t(play video in console)",
             "usage": {
                 "video test": "Test video playback",
-                "video [absolute video path]": "Play specified video"
+                "video [video path]": "Play specified video (fit to terminal)",
+                "video [video path] -w 120": "Limit render width (columns)",
+                "video [video path] -h 30": "Limit render height (rows)",
+                "video [video path] --fps 15": "Override playback FPS (lower can reduce lag)",
+                "video [video path] --loop": "Loop playback",
+                "video [video path] --gray": "Grayscale render (still uses color blocks)",
+                "video [video path] --no-color": "ASCII render without colors (better compatibility)"
             }
         },
         {
