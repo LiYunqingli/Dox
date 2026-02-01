@@ -117,6 +117,18 @@
                 "video test": "Test video playback",
                 "video [absolute video path]": "Play specified video"
             }
+        },
+        {
+            "name": "IMG",
+            "msg": "img\t(view image in console)",
+            "usage": {
+                "img test": "Render the built-in test image",
+                "img [image path]": "Render an image in low resolution (fit to terminal)",
+                "img [image path] -w 120": "Limit render width (columns)",
+                "img [image path] -h 30": "Limit render height (rows)",
+                "img [image path] --gray": "Grayscale render (still uses color blocks)",
+                "img [image path] --no-color": "ASCII render without colors (better compatibility)"
+            }
         }
     ]
 }

@@ -251,6 +251,67 @@ def video(path):
             from lib.src.video import video_in_cmd
             video_in_cmd(path)
 
+# 指定一个路径在控制台显示图片（低分辨率）
+def img(input_str):
+    """在终端以较低分辨率查看图片
+
+    用法：
+        img [图片路径] [-w 宽度] [-h 高度] [--gray] [--no-color]
+    """
+
+    items = input_str.split()[1:]  # 去除命令本身
+    if len(items) == 0:
+        _print("_13_\n", "red")
+        return
+
+    path = items[0]
+    max_width = None
+    max_height = None
+    grayscale = False
+    no_color = False
+
+    i = 1
+    while i < len(items):
+        arg = items[i]
+        if arg in ("-w", "--width"):
+            if i + 1 >= len(items):
+                _print("_13_\n", "red")
+                return
+            max_width = int(items[i + 1])
+            i += 2
+            continue
+        if arg in ("-h", "--height"):
+            if i + 1 >= len(items):
+                _print("_13_\n", "red")
+                return
+            max_height = int(items[i + 1])
+            i += 2
+            continue
+        if arg in ("--gray", "--grey", "-g"):
+            grayscale = True
+            i += 1
+            continue
+        if arg in ("--no-color", "--ascii"):
+            no_color = True
+            i += 1
+            continue
+
+        # 未识别参数
+        _print("_13_\n", "red")
+        return
+
+    import os
+
+    if path.lower() == "test":
+        path = get_run_path() + "/../resources/img/test_img.png"
+
+    if not os.path.exists(path):
+        _print("\n_7__5_\n\n")
+        return
+
+    from lib.src.img import image_in_cmd
+    image_in_cmd(path, max_width=max_width, max_height=max_height, grayscale=grayscale, no_color=no_color)
+
 #软件包管理器
 def pck(input_str):
     items = input_str.split()[1:] # 去除命令本身
@@ -455,6 +516,8 @@ def command(input_str):
             video(input_list[1])
         else:
             _print("_13_\n", "red")
+    elif command.lower() == "img":
+        img(input_str)
     elif command.lower() == "pck":
         pck(input_str)
     elif command.lower() == "download":

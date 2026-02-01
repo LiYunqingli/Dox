@@ -64,6 +64,7 @@ python main.py -r "cd /; ls; pwd"
 | ```clear``` | 清空屏幕 | clear |
 | ```version``` | 显示版本信息 | version |
 | ```video``` | 播放视频 | video test (测试视频) |
+| ```img``` | 查看图片（低分辨率渲染） | img test / img D:\\a.png |
 | ```exit``` | 退出程序 | exit |
 
 ## 🌍 多语言支持
