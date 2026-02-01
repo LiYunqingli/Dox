@@ -1,0 +1,9 @@
+# Dox Python dependencies
+#
+# Core runtime dependencies
+requests>=2.31.0
+Pillow>=10.0.0
+
+# Optional: required only for the `video` command (terminal video playback)
+# opencv-python is large; install it only if you need video playback.
+# opencv-python>=4.8.0
