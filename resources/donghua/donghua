@@ -12,3 +12,11 @@ DDD      DDD    OOO        OOO     XXX    XXX
 DDD      DDD    OOOO      OOOO    XXX      XXX
 DDDDDDDDDDD      OOOOOOOOOOOO     XXX      XXX
 DDDDDDDDDD        OOOOOOOOOO      XXX      XXX
+
+LL        HH       HH  RR RRR
+LL        HH       HH  RR     RR
+LL        HH       HH  RR     RR
+LL        HHHHHHHHHHH  RR RRR
+LL        HH       HH  RR R
+LL        HH       HH  RR  RR
+LLLLLLLLL HH       HH  RR    RRR
