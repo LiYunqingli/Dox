@@ -1,156 +1,137 @@
-# Dox 终端工具
+# Dox
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python Version](https://img.shields.io/badge/python-3.7%2B-green.svg)
+![Python Version](https://img.shields.io/badge/python-3.9%2B-green.svg)
 
-一个跨平台的命令行工具，提供类Linux操作体验，支持视频播放、多语言交互和丰富的扩展功能。
+一个轻量的终端交互工具：提供类 Linux 的基础命令体验，并额外支持在终端里“看图/看视频（可选依赖）”、下载文件、以及实验性的包元数据管理（pck）。
 
-## 🌟 功能特性
+## 功能
 
-- **类Linux命令** - 支持常用命令如 `ls`, `cd`, `pwd`, `clear` 等
-- **多语言支持** - 中英文双语切换（默认中文）
-- **彩色终端输出** - 支持多种颜色和高亮显示
-- **视频播放** - 直接在控制台播放视频（测试视频彩蛋）
-- **批处理模式** - 支持通过参数批量执行命令
-- **扩展框架** - 模块化设计，易于功能扩展
+- **交互式 REPL**：无参数启动进入交互模式
+- **单命令/批处理执行**：支持 `python main.py <cmd ...>` 与 `-r "cmd1; cmd2"`
+- **类 Linux 常用命令**：`cd` / `ls` / `ll` / `pwd` / `rm` / `clear` / `version`
+- **终端渲染**：
+  - `img`：将图片低分辨率渲染到终端（彩色块/灰度/纯 ASCII）
+  - `video`：将视频以帧方式渲染到终端（需要额外安装 OpenCV）
+- **下载器**：`download <url> <path>`（带进度条）
+- **多语言输出**：基于 `resources/lang/src/*.json` 的消息映射
 
-## 📥 安装与运行
+## 依赖
 
-### 前置要求
-- Python 3.7+
-- 推荐终端：
-  - Windows: Windows Terminal / PowerShell
-  - Linux/macOS: 默认终端
+### Python
+
+- Python 3.9+（项目中使用了 `tuple[int, int]` 这类类型注解语法）
+
+### 第三方库（pip）
+
+- `requests`：用于 `download` 命令
+- `Pillow (PIL)`：用于 `img` / `video` 的帧/图片处理
+- `opencv-python`（可选）：仅 `video` 命令需要
+
+依赖清单见 `requirements.txt`。
+
+### 外部命令（可选）
+
+- `curl`：目前 `pck update` 使用 `curl` 做连通性与元数据拉取（需要系统 PATH 可用）
+
+## 安装
 
 ```bash
-# 克隆仓库
-git clone https://gitea.lihuarong.cn:8080/LiHuarong/Dox.git
-cd Dox
-# 安装依赖
 pip install -r requirements.txt
-# 运行程序
-python main.py
-
 ```
 
-## 📖 使用说明
+如果需要 `video` 命令：
+
+```bash
+pip install opencv-python
+```
+
+## 运行与使用
 
 ### 交互模式
 
 ```bash
-help
-cd Documents
-Documents >> ls -l
+python main.py
 ```
 
-### 命令行参数模式
+进入后使用：
+
+```text
+help
+ls
+ll
+cd <path>
+pwd
+```
+
+### 单命令模式
 
 ```bash
-# 单命令模式
 python main.py ls -l
-# 批量命令模式
-python main.py -r "cd /; ls; pwd"
+python main.py img test
+python main.py video test --fps 15
 ```
 
-## 📚 命令手册
+### 批处理模式（-r）
 
-| 命令 | 描述 | 使用示例 |
-| --- | --- | --- |
-| ```help``` | 显示帮助信息 | help ls |
-| ```cd``` | 切换工作目录 | cd ../ |
-| ```ls``` | 列出目录内容 | ls -l (详细模式) |
-| ```ll``` | 同 ls -l | ll |
-| ```pwd``` | 显示当前路径 | pwd |
-| ```clear``` | 清空屏幕 | clear |
-| ```version``` | 显示版本信息 | version |
-| ```video``` | 播放视频 | video test (测试视频) |
-| ```img``` | 查看图片（低分辨率渲染） | img test / img D:\\a.png |
-| ```exit``` | 退出程序 | exit |
-
-## 🌍 多语言支持
-
-修改 config/config.json 中的语言设置：
-
-```json
-{
-  "Config": {
-    "Lang": "zh-CN"  // 可选 en-US
-  }
-}
+```bash
+python main.py -r "cd ..; ls; pwd"
 ```
 
-## 🛠️ 开发与贡献
+## 命令概览
 
-欢迎提交 Pull Request 或 Issue，共同改进项目。请遵循以下步骤：
+| 命令 | 说明 |
+| --- | --- |
+| `help [cmd]` | 显示帮助（按语言包输出） |
+| `version` | 显示版本信息 |
+| `cd <path>` | 切换目录 |
+| `ls [-l]` / `ll` | 列目录（`-l` 详细信息） |
+| `pwd` | 输出当前路径 |
+| `clear` | 清屏 |
+| `rm [-r] [-f] <path...>` | 删除文件/目录（`-r` 递归，`-f` 强制） |
+| `img <path|test> [-w N] [-h N] [--gray] [--no-color]` | 终端看图 |
+| `video <path|test> [-w N] [-h N] [--fps N] [--loop] [--gray] [--no-color]` | 终端看视频（可选依赖） |
+| `download <url> <path>` | 下载文件（显示进度） |
+| `pck <subcmd ...>` | 软件包元数据管理（实验性） |
+| `donghua` | 彩蛋动画 |
+| `exit` | 退出 |
 
-1. Fork 本仓库
-2. 创建功能分支 (git checkout -b feature/your-feature)
-3. 提交修改 (git commit -m 'Add some feature')
-4. 推送到分支 (git push origin feature/your-feature)
-5. 创建 Pull Request
+## 配置
 
-代码规范：
+配置文件：`config/config.json`
 
-- 清晰的目录架构，核心功能和附加功能分开不同的文件封装
-- 新增功能需添加对应单元测试
-- 修改语言文件需同步更新中英文版本
-- 代码注释清晰，便于他人理解和维护
-- config.json 文件中新增配置项需添加注释说明
+- `Config.Lang`：语言（例如 `zh-CN` / `en-US`）
+- `Config.Pck`：pck 服务器配置（名称/地址）
 
-## 📜 许可证
+## pck（实验性）
 
-本项目遵循 MIT 许可证。请查看 LICENSE 文件了解更多信息。
+当前实现以“元数据查询/更新”为主：
 
-## 🎮 彩蛋功能
+- `pck update`：从配置的服务器地址拉取 `package/Release.json`
+- `pck list`：列出 Release.json 中的 apps
+- `pck search <name>`：查找并输出某个包元数据
+- `pck install ...`：目前仍是占位逻辑（会输出待安装列表，但未完成真实安装流程）
 
-输入 ```donghua``` 命令体验特殊动画效果（开发者预留惊喜）
+## 项目结构
 
-## 🛠️ 功能路线图
+```text
+main.py                 入口（参数模式/交互模式）
+lib/lib.py              命令分发与通用工具函数
+lib/src/img.py           终端图片渲染（Pillow）
+lib/src/video.py         终端视频渲染（OpenCV + Pillow）
+lib/src/pck.py           pck 元数据相关逻辑
+config/config.json       配置
+resources/lang/src/*     多语言消息与帮助
+package/Release.json     pck 元数据缓存
+```
 
-### ✅ 已实现功能
+## 贡献
 
-**核心功能**
-- [x] 类Linux文件系统操作（ls/cd/pwd）
-- [x] 多语言支持系统（中/英文）
-- [x] 终端彩色输出系统
-- [x] 批处理命令模式（-r参数）
-- [x] 控制台视频播放器（ASCII渲染）
+欢迎 PR / Issue。
 
-**先进的**
-- [x] Windows/Linux/macOS多平台适配
-- [x] 动态路径自动补全
-- [x] 权限错误处理机制
-- [x] 安全命令沙箱环境
+- 新命令建议放在 `lib/lib.py` 的 `command()` 分发处，并在语言包里补齐 help 文案
+- 新增依赖请同步更新 `requirements.txt` 与本 README 的“依赖”章节
 
-### 🔜 未来规划
-**包管理 (pck)** 🚧
-- [x] `pck install` - 安装Dox生态软件包
-- [ ] `pck remove` - 卸载Dox生态软件包
-- [x] `pck list` - 列出已安装的Dox生态软件包
-- [x] `pck install package -y` - 忽略确认安装
-- [x] `pck search` - 搜索可用软件包
-- [x] `pck update` - 更新本地软件仓库
-- [ ] `pck build` - 创建自定义软件包
+## 许可证
 
-**扩展插件**
-- [ ] 插件热加载框架
-- [x] 官方软件包市场
-- [ ] 沙箱化插件运行时
-- [ ] 插件签名验证系统
-
-**终端增强**
-- [ ] 客户端局域网集成
-- [ ] 终端主题商店（配色方案）
-- [x] ASCII艺术生成器
-
-**游戏 & 娱乐** 🎮
-- [ ] 终端贪吃蛇游戏
-- [ ] 每日开发者彩蛋
-
-**DevOps工具**
-- [ ] 内置HTTP服务器
-- [ ] 开发者常用工具
-
-**安全**
-- [ ] 操作审计日志
-- [x] 加密文件保险箱
+MIT，见 LICENSE。
