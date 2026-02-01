@@ -54,6 +54,7 @@ def video_in_cmd(
     loop: bool = False,
     grayscale: bool = False,
     no_color: bool = False,
+    page_break: bool = True,
 ) -> None:
     """Play a video in terminal.
 
@@ -76,7 +77,8 @@ def video_in_cmd(
     signal.signal(signal.SIGINT, _signal_handler)
     exit_flag = False
 
-    cols, rows = _get_terminal_size()
+    term_cols, term_rows = _get_terminal_size()
+    cols, rows = term_cols, term_rows
     if max_width is not None:
         cols = max(1, int(max_width))
     if max_height is not None:
@@ -91,6 +93,12 @@ def video_in_cmd(
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             raise ValueError("无法打开视频文件")
+
+        # 翻页：避免后续使用 \033[H 回到左上角重绘时覆盖之前的命令输出。
+        # 不使用 clear/cls，这样历史输出仍可在滚动区查看。
+        if page_break:
+            print("\n" * max(term_rows, 1), end="", flush=True)
+            print("\033[H", end="", flush=True)
 
         src_fps = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
         use_fps = float(fps) if fps is not None else src_fps

@@ -345,6 +345,7 @@ def video(input_str):
             loop=loop,
             grayscale=grayscale,
             no_color=no_color,
+            page_break=True,
         )
     except Exception as e:
         _print(f"\n_7_{str(e)}\n\n", "red")
