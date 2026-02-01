@@ -89,8 +89,8 @@ python main.py -r "cd ..; ls; pwd"
 | `pwd` | 输出当前路径 |
 | `clear` | 清屏 |
 | `rm [-r] [-f] <path...>` | 删除文件/目录（`-r` 递归，`-f` 强制） |
-| `img <path|test> [-w N] [-h N] [--gray] [--no-color]` | 终端看图 |
-| `video <path|test> [-w N] [-h N] [--fps N] [--loop] [--gray] [--no-color]` | 终端看视频（可选依赖） |
+| `img <path/test> [-w N] [-h N] [--gray] [--no-color]` | 终端看图 |
+| `video <path/test> [-w N] [-h N] [--fps N] [--loop] [--gray] [--no-color]` | 终端看视频（可选依赖） |
 | `download <url> <path>` | 下载文件（显示进度） |
 | `pck <subcmd ...>` | 软件包元数据管理（实验性） |
 | `donghua` | 彩蛋动画 |
