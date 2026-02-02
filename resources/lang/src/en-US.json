@@ -79,7 +79,9 @@
             "msg": "argv\t(Execute command line parameters)",
             "usage": {
                 "[current instance] [command]": "Console runs the current executable file with parameters passed in, executes a single command but does not start interactive mode",
-                "[current instance] -r \"[command1];[command2];...\"": "The console runs the current executable file with the parameter - r, sequentially traverses and executes the incoming commands, executes multiple commands without starting interactive mode"
+                "[current instance] -r \"[command1];[command2];...\"": "The console runs the current executable file with the parameter - r, sequentially traverses and executes the incoming commands, executes multiple commands without starting interactive mode",
+                "[current instance] [--cd-script|--cd-home|--no-cd] [command]": "Override startup working directory (cwd): --cd-script changes to script dir; --cd-home changes to HOME; --no-cd keeps current dir",
+                "[current instance] [--cd-script|--cd-home|--no-cd] -r \"[command1];[command2];...\"": "Batch mode supports the same cwd flags; if not specified, command-line mode defaults to script dir"
             }
         },
         {
