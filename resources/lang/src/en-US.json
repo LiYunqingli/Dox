@@ -51,7 +51,27 @@
         "43": "Cancelled",
         "44": "Error: cannot set child under '%s' (not an object)",
         "45": "Error: Config is not an object; cannot set",
-        "46": "Error: failed to write config file: %s"
+        "46": "Error: failed to write config file: %s",
+        "47": "Current PATH (temp + persistent): %s",
+        "48": "Persistent PATH entries: %s",
+        "49": "Temporary PATH entries: %s",
+        "50": "Persistent PATH (%s):",
+        "51": "  %s. %s",
+        "52": "Temporary PATH (%s):",
+        "53": "Added to persistent PATH: %s",
+        "54": "Added to temporary PATH: %s",
+        "55": "Already exists in PATH: %s",
+        "56": "Removed from persistent PATH: %s",
+        "57": "Removed from temporary PATH: %s",
+        "58": "Not found: %s",
+        "59": "Cleared persistent PATH",
+        "60": "Usage: path add|rm <dir> [-p|--persist] [-t|--temp] [--all]",
+        "61": "Usage: path clear [-p|--persist] [-t|--temp] [--all]",
+        "62": "Cleared temporary PATH",
+        "63": "Error: failed to read path.json: %s",
+        "64": "Error: failed to write path.json: %s",
+        "65": "Unknown subcommand: %s",
+        "66": "%s=%s"
     },
     "help": [
         {
@@ -148,6 +168,69 @@
                 "img [image path] -h 30": "Limit render height (rows)",
                 "img [image path] --gray": "Grayscale render (still uses color blocks)",
                 "img [image path] --no-color": "ASCII render without colors (better compatibility)"
+            }
+        },
+        {
+            "name": "PCK",
+            "msg": "pck\t(package manager)",
+            "usage": {
+                "pck install [pkg1] [pkg2] ...": "Install one or more packages",
+                "pck install [pkg...] -y": "Install without confirmation",
+                "pck update": "Update package index/list",
+                "pck list": "List installed packages",
+                "pck search [keyword]": "Search packages"
+            }
+        },
+        {
+            "name": "DOWNLOAD",
+            "msg": "download\t(download file)",
+            "usage": {
+                "download [URL] [save path]": "Download a file to the specified path"
+            }
+        },
+        {
+            "name": "RM",
+            "msg": "rm\t(remove files/directories)",
+            "usage": {
+                "rm [file...]": "Remove one or more files (asks for confirmation)",
+                "rm -f [file...]": "Force remove (no confirmation)",
+                "rm -r [dir...]": "Recursive remove directories (asks for confirmation)",
+                "rm -rf [dir/file...]": "Recursive force remove"
+            }
+        },
+        {
+            "name": "SET",
+            "msg": "set\t(update Config)",
+            "usage": {
+                "set [key] [value]": "Update Config in config.json (dot path supported, e.g. Pck.Name)",
+                "set Lang en-US": "Switch language",
+                "set Pck.Addr http://127.0.0.1:8081/": "Set pck server address"
+            }
+        },
+        {
+            "name": "PATH",
+            "msg": "path\t(manage PATH)",
+            "usage": {
+                "path": "Show current PATH (merged temp + persistent)",
+                "path list": "List persistent/temp PATH entries",
+                "path add [dir]": "Add to persistent PATH (default)",
+                "path add [dir] -p": "Add to persistent PATH (writes path.json)",
+                "path add [dir] -t": "Add to temporary PATH (session only)",
+                "path rm [dir]": "Remove from persistent PATH (default)",
+                "path rm [dir] -t": "Remove from temporary PATH",
+                "path rm [dir] --all": "Remove from both persistent and temporary",
+                "path clear -p": "Clear persistent PATH",
+                "path clear -t": "Clear temporary PATH",
+                "path clear --all": "Clear both persistent and temporary"
+            }
+        },
+        {
+            "name": "ENV",
+            "msg": "env\t(read environment variables)",
+            "usage": {
+                "env": "Print PATH (merged temp + persistent)",
+                "env PATH": "Print PATH (same as above)",
+                "env [VAR]": "Print an environment variable (from process env)"
             }
         }
     ]

@@ -51,7 +51,27 @@
         "43": "已取消",
         "44": "错误：无法在 '%s' 下写入子项（当前不是对象）",
         "45": "错误：Config 字段不是对象，无法 set",
-        "46": "错误：写入配置文件失败：%s"
+        "46": "错误：写入配置文件失败：%s",
+        "47": "当前 PATH（临时+永久）：%s",
+        "48": "永久 PATH 条目数：%s",
+        "49": "临时 PATH 条目数：%s",
+        "50": "永久 PATH（%s）：",
+        "51": "  %s. %s",
+        "52": "临时 PATH（%s）：",
+        "53": "已添加到永久 PATH：%s",
+        "54": "已添加到临时 PATH：%s",
+        "55": "PATH 中已存在：%s",
+        "56": "已从永久 PATH 删除：%s",
+        "57": "已从临时 PATH 删除：%s",
+        "58": "未找到：%s",
+        "59": "已清空永久 PATH",
+        "60": "用法：path add|rm <dir> [-p|--persist] [-t|--temp] [--all]",
+        "61": "用法：path clear [-p|--persist] [-t|--temp] [--all]",
+        "62": "已清空临时 PATH",
+        "63": "错误：读取 path.json 失败：%s",
+        "64": "错误：写入 path.json 失败：%s",
+        "65": "未知子命令：%s",
+        "66": "%s=%s"
     },
     "help": [
         {
@@ -148,6 +168,69 @@
                 "img [图片路径] -h 30": "限制渲染高度（行数）",
                 "img [图片路径] --gray": "灰度渲染（仍使用色块）",
                 "img [图片路径] --no-color": "无颜色 ASCII 渲染（兼容性更好）"
+            }
+        },
+        {
+            "name": "PCK",
+            "msg": "pck\t(软件包管理器)",
+            "usage": {
+                "pck install [包名1] [包名2] ...": "安装一个或多个软件包",
+                "pck install [包名...] -y": "无需确认直接安装",
+                "pck update": "更新软件包列表/索引",
+                "pck list": "列出已安装的软件包",
+                "pck search [关键字]": "搜索软件包"
+            }
+        },
+        {
+            "name": "DOWNLOAD",
+            "msg": "download\t(下载文件)",
+            "usage": {
+                "download [URL] [保存路径]": "下载文件到指定路径"
+            }
+        },
+        {
+            "name": "RM",
+            "msg": "rm\t(删除文件/目录)",
+            "usage": {
+                "rm [文件...]": "删除一个或多个文件（会询问确认）",
+                "rm -f [文件...]": "强制删除（不询问确认）",
+                "rm -r [目录...]": "递归删除目录（会询问确认）",
+                "rm -rf [目录/文件...]": "递归强制删除"
+            }
+        },
+        {
+            "name": "SET",
+            "msg": "set\t(修改配置 Config)",
+            "usage": {
+                "set [key] [value]": "修改 config.json 的 Config 下的配置项（支持点号路径，如 Pck.Name）",
+                "set Lang zh-CN": "切换语言",
+                "set Pck.Addr http://127.0.0.1:8081/": "设置 pck 服务器地址"
+            }
+        },
+        {
+            "name": "PATH",
+            "msg": "path\t(PATH 环境变量管理)",
+            "usage": {
+                "path": "显示当前 PATH（临时+永久合并）",
+                "path list": "分别列出永久/临时 PATH 条目",
+                "path add [目录]": "添加到永久 PATH（默认）",
+                "path add [目录] -p": "添加到永久 PATH（写入 path.json）",
+                "path add [目录] -t": "添加到临时 PATH（仅本次会话）",
+                "path rm [目录]": "从永久 PATH 删除（默认）",
+                "path rm [目录] -t": "从临时 PATH 删除",
+                "path rm [目录] --all": "同时从永久/临时删除",
+                "path clear -p": "清空永久 PATH",
+                "path clear -t": "清空临时 PATH",
+                "path clear --all": "同时清空永久/临时"
+            }
+        },
+        {
+            "name": "ENV",
+            "msg": "env\t(读取环境变量)",
+            "usage": {
+                "env": "输出 PATH（临时+永久合并后的值）",
+                "env PATH": "输出 PATH（同上）",
+                "env [变量名]": "输出指定环境变量（读取系统进程环境）"
             }
         }
     ]
