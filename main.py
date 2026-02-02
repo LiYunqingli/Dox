@@ -6,6 +6,18 @@ from lib.lib import load, _print, command#,  clear
 import os
 import sys
 
+readline_loaded = False
+if sys.platform == "linux":
+    try:
+        import readline
+        # 仅在导入成功后配置退格键
+        readline.parse_and_bind('"\b": backward-delete-char')
+        readline.parse_and_bind('"\C-h": backward-delete-char')
+        readline_loaded = True
+    except (ImportError, ModuleNotFoundError, Exception):
+        # 捕获所有导入相关异常，静默跳过（也可添加日志提示）
+        pass
+
 if __name__ == '__main__':
     os.chdir(os.path.expanduser('~'))
     
@@ -51,8 +63,8 @@ if __name__ == '__main__':
                 base_name = os.path.basename(userPath) #只显示当前目录名
                 if base_name == "":
                     base_name = "/" #如果当前目录为根目录，则显示为"/" 注意需要考虑windows下的兼容性（目前仅考虑Ubuntu）
-                _print("Dox:" + base_name + ">>")
-                input_str = input()
+                # _print("Dox:" + base_name + ">>")
+                input_str = input("Dox:" + base_name + ">>")
                 if input_str.lower() == "exit":
                     print("exit")
                     sys.exit()
