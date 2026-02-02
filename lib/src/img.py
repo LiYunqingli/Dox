@@ -5,7 +5,7 @@ from PIL import Image
 
 
 def _enable_virtual_terminal_processing() -> None:
-    """Enable ANSI escape sequence processing on Windows terminals."""
+    """在Windows终端上启用ANSI转义序列处理（尽力而为）。"""
     if os.name != "nt":
         return
 
@@ -22,7 +22,7 @@ def _enable_virtual_terminal_processing() -> None:
         new_mode = mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
         kernel32.SetConsoleMode(handle, new_mode)
     except Exception:
-        # Best-effort; if it fails, output may still work on modern terminals.
+        # 尽力而为；如果失败，现代终端可能仍然能正常输出。
         return
 
 
@@ -34,9 +34,9 @@ def image_in_cmd(
     grayscale: bool = False,
     no_color: bool = False,
 ) -> None:
-    """Render an image to the terminal using low-resolution blocks.
+    """在终端使用低分辨率块渲染图像。
 
-    Uses a half-block character (▀) so each terminal row represents two pixel rows.
+    使用半块字符 (▀)，因此每个终端行表示两行像素。
     """
 
     _enable_virtual_terminal_processing()
@@ -61,7 +61,7 @@ def image_in_cmd(
 
     src_width, src_height = img.size
     if src_height == 0:
-        raise ValueError("Invalid image height")
+        raise ValueError("无效的图像高度")
 
     aspect_ratio = src_width / src_height
 

@@ -7,7 +7,7 @@ from PIL import Image
 
 
 def _enable_virtual_terminal_processing() -> None:
-    """Enable ANSI escape sequence processing on Windows terminals."""
+    """在Windows终端上启用ANSI转义序列处理。"""
     if os.name != "nt":
         return
 
@@ -56,12 +56,12 @@ def video_in_cmd(
     no_color: bool = False,
     page_break: bool = True,
 ) -> None:
-    """Play a video in terminal.
+    """在终端中播放视频。
 
-    Rendering strategy:
-    - Default: 24-bit color blocks using half-block character (▀)
-    - grayscale: keep blocks but convert colors to grayscale
-    - no_color: ASCII ramp without ANSI colors (more compatible)
+    渲染策略：
+    - 默认：使用半块字符 (▀) 的24位彩色块
+    - grayscale：保持块状但将颜色转换为灰度
+    - no_color：无ANSI颜色的ASCII梯度（更兼容）
     """
 
     global exit_flag
