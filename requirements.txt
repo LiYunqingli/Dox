@@ -3,6 +3,7 @@
 # Core runtime dependencies
 requests>=2.31.0
 Pillow>=10.0.0
+readline
 
 # Optional: required only for the `video` command (terminal video playback)
 # opencv-python is large; install it only if you need video playback.
