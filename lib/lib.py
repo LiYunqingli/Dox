@@ -33,6 +33,12 @@ def get_lang():
 def _print(input_str="\n", color=None, items=[]):
     import json
     import re
+
+    # Ensure ANSI colors work on Windows (best-effort)
+    try:
+        _enable_virtual_terminal_processing()
+    except Exception:
+        pass
     
     COLORS = {
         "black": "\033[30m",
@@ -98,6 +104,36 @@ def clear():
     import os
     os.system('cls' if os.name == 'nt' else 'clear')
 
+
+_VT_ENABLED = False
+
+
+def _enable_virtual_terminal_processing() -> None:
+    """Enable ANSI escape sequence processing on Windows terminals (best-effort)."""
+    global _VT_ENABLED
+    if _VT_ENABLED:
+        return
+    _VT_ENABLED = True
+
+    import os
+    if os.name != "nt":
+        return
+
+    try:
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+        mode = ctypes.c_uint32()
+        if kernel32.GetConsoleMode(handle, ctypes.byref(mode)) == 0:
+            return
+
+        ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+        new_mode = mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+        kernel32.SetConsoleMode(handle, new_mode)
+    except Exception:
+        return
+
 #打印帮助信息（自动根据语言设置选择对应的语言包）
 def help(input_str):
     """显示帮助信息"""
@@ -159,74 +195,467 @@ def cd(path):
 
 #列出目录内容（仿Linux）
 def ls(detailed=False):
-    """列出当前目录内容
-    Args:
-        detailed (bool): 是否显示详细信息（类似ls -l）
+    """列出当前目录内容（更清爽的输出）
+
+    默认：多列对齐、目录优先、按名称排序
+    详细：类似 `ls -lh`（权限/大小/时间/名称）
     """
+
     import os
-    import time
     import stat
-    import platform
-    import sys
+    import time
+    import unicodedata
+    from dataclasses import dataclass
+
+    _enable_virtual_terminal_processing()
+
+    @dataclass(frozen=True)
+    class _Entry:
+        name: str
+        path: str
+        is_dir: bool
+        is_link: bool
+        mode: int
+        size: int
+        mtime: float
+
+    def _display_width(s: str) -> int:
+        w = 0
+        for ch in s:
+            if ch == "\t":
+                w += 4
+                continue
+            if unicodedata.east_asian_width(ch) in {"W", "F"}:
+                w += 2
+            else:
+                w += 1
+        return w
+
+    def _pad(s: str, width: int) -> str:
+        return s + (" " * max(width - _display_width(s), 0))
+
+    def _human_size(num: int) -> str:
+        try:
+            n = float(num)
+        except Exception:
+            return str(num)
+        units = ["B", "K", "M", "G", "T", "P"]
+        idx = 0
+        while n >= 1024 and idx < len(units) - 1:
+            n /= 1024
+            idx += 1
+        if idx == 0:
+            return f"{int(n)}{units[idx]}"
+        if n >= 10:
+            return f"{n:.0f}{units[idx]}"
+        return f"{n:.1f}{units[idx]}"
+
+    def _format_mtime(ts: float) -> str:
+        return time.strftime("%Y-%m-%d %H:%M", time.localtime(ts))
+
+    def _format_mode(mode: int, is_dir: bool, is_link: bool) -> str:
+        file_type = "d" if is_dir else "l" if is_link else "-"
+        def bit(ch: str, mask: int) -> str:
+            return ch if (mode & mask) else "-"
+        return (
+            file_type
+            + bit("r", stat.S_IRUSR)
+            + bit("w", stat.S_IWUSR)
+            + bit("x", stat.S_IXUSR)
+            + bit("r", stat.S_IRGRP)
+            + bit("w", stat.S_IWGRP)
+            + bit("x", stat.S_IXGRP)
+            + bit("r", stat.S_IROTH)
+            + bit("w", stat.S_IWOTH)
+            + bit("x", stat.S_IXOTH)
+        )
+
+    def _colorize(label: str, e: _Entry) -> str:
+        # Short listing uses colors by default
+        blue = "\033[34m"
+        cyan = "\033[36m"
+        green = "\033[32m"
+        dim = "\033[2m"
+        reset = "\033[0m"
+
+        color = ""
+        if e.is_dir:
+            color = blue
+        elif e.is_link:
+            color = cyan
+        elif e.mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH):
+            color = green
+
+        if e.name.startswith("."):
+            color = (dim + color) if color else dim
+
+        return f"{color}{label}{reset}" if color else label
+
+    def _iter_entries(base: str) -> list[_Entry]:
+        out: list[_Entry] = []
+        with os.scandir(base) as it:
+            for de in it:
+                try:
+                    st = de.stat(follow_symlinks=False)
+                    out.append(
+                        _Entry(
+                            name=de.name,
+                            path=de.path,
+                            is_dir=de.is_dir(follow_symlinks=False),
+                            is_link=de.is_symlink(),
+                            mode=st.st_mode,
+                            size=int(getattr(st, "st_size", 0) or 0),
+                            mtime=float(getattr(st, "st_mtime", 0.0) or 0.0),
+                        )
+                    )
+                except Exception:
+                    continue
+        return out
 
     try:
-        items = os.listdir()
-        if not detailed:
-            # 简单模式
-            for item in items:
-                if os.path.isdir(item):
-                    _print(f"\033[34m{item}/\033[0m ")  # 蓝色显示目录
-                elif os.path.isfile(item):
-                    _print(f"{item} ")
-                else:
-                    _print(f"\033[33m{item}\033[0m ")  # 黄色显示特殊文件
+        base = os.getcwd()
+        entries = _iter_entries(base)
+        # Default: dirs first + name sort
+        entries.sort(key=lambda e: (0 if e.is_dir else 1, e.name.casefold()))
+
+        if detailed:
+            size_strs = [_human_size(e.size) for e in entries]
+            size_w = max((len(s) for s in size_strs), default=1)
+            for e, size_s in zip(entries, size_strs):
+                suffix = "/" if e.is_dir else "@" if e.is_link else ""
+                name = _colorize(f"{e.name}{suffix}", e)
+                _print(f"{_format_mode(e.mode, e.is_dir, e.is_link)} {size_s:>{size_w}} {_format_mtime(e.mtime)} {name}\n")
+            return
+
+        # Short listing (grid)
+        try:
+            term_cols, _ = os.get_terminal_size()
+            term_cols = max(int(term_cols), 20)
+        except Exception:
+            term_cols = 80
+
+        labels_plain: list[str] = []
+        labels_color: list[str] = []
+        widths: list[int] = []
+        for e in entries:
+            suffix = "/" if e.is_dir else "@" if e.is_link else ""
+            plain = f"{e.name}{suffix}"
+            labels_plain.append(plain)
+            labels_color.append(_colorize(plain, e))
+            widths.append(_display_width(plain))
+
+        if not labels_plain:
             _print("\n")
-        else:
-            # 详细模式（跨平台实现）
-            for item in items:
-                try:
-                    stat_info = os.stat(item)
-                    mode = stat_info.st_mode
-                    file_type = 'd' if stat.S_ISDIR(mode) else '-' if stat.S_ISREG(mode) else '?'
-                    permissions = [
-                        'r' if mode & stat.S_IRUSR else '-',
-                        'w' if mode & stat.S_IWUSR else '-',
-                        'x' if mode & stat.S_IXUSR else '-',
-                        'r' if mode & stat.S_IRGRP else '-',
-                        'w' if mode & stat.S_IWGRP else '-',
-                        'x' if mode & stat.S_IXGRP else '-',
-                        'r' if mode & stat.S_IROTH else '-',
-                        'w' if mode & stat.S_IWOTH else '-',
-                        'x' if mode & stat.S_IXOTH else '-'
-                    ]
-                    
-                    if platform.system() == 'Windows':
-                        owner = str(stat_info.st_uid)
-                        group = str(stat_info.st_gid)
-                    else:
-                        import pwd
-                        import grp
-                        owner = pwd.getpwuid(stat_info.st_uid).pw_name
-                        group = grp.getgrgid(stat_info.st_gid).gr_name
-                    
-                    size = stat_info.st_size
-                    mtime = time.strftime("%b %d %H:%M", time.localtime(stat_info.st_mtime))
-                    
-                    color_code = ""
-                    reset_code = "\033[0m"
-                    if stat.S_ISDIR(mode):
-                        color_code = "\033[34m"  # 目录蓝色
-                    elif stat.S_ISLNK(mode):
-                        color_code = "\033[36m"  # 链接青色
-                    elif mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH):
-                        color_code = "\033[32m"  # 可执行文件绿色
-                    
-                    _print(f"{file_type}{''.join(permissions)} {stat_info.st_nlink} {owner} {group} "
-                        f"{size:>8} {mtime} {color_code}{item}{reset_code}\n")
-                except Exception as e:
-                    _print(f"_9_{item}: {str(e)}\n")
+            return
+
+        maxw = min(max(widths), 60)
+        colw = maxw + 2
+        ncols = max(1, term_cols // colw)
+        nrows = (len(labels_plain) + ncols - 1) // ncols
+
+        for r in range(nrows):
+            parts = []
+            for c in range(ncols):
+                idx = c * nrows + r
+                if idx >= len(labels_plain):
+                    continue
+                plain = labels_plain[idx]
+                colored = labels_color[idx]
+                if _display_width(plain) > maxw:
+                    keep = maxw - 1
+                    cut = plain
+                    while _display_width(cut) > keep and len(cut) > 0:
+                        cut = cut[1:]
+                    short_plain = "…" + cut
+                    # Re-colorize based on type (safe: entries aligned)
+                    colored = _colorize(short_plain, entries[idx])
+                parts.append(_pad(colored, maxw) + "  ")
+            _print("".join(parts).rstrip() + "\n")
     except Exception as e:
-        _print(f"_7_{str(e)}\n")
+        _print(f"_7_{str(e)}\n", "red")
+
+
+def ls_cmd(input_str: str) -> None:
+    """解析并执行 ls/ll（增强版）。
+
+    兼容原行为：
+      - `ls`：短列表
+      - `ls -l` / `ll`：详细列表
+
+    额外支持：
+      - `-a`：显示隐藏文件（以 . 开头）
+      - `-1`：单列输出
+      - `-r`：反向排序
+      - `--sort name|time|size`
+      - `--no-color`：关闭颜色
+      - `--no-dirs-first`：不将目录置顶
+      - `[path]`：列出指定目录（不支持多个路径）
+    """
+    import os
+    import shlex
+    import stat
+    import time
+    import unicodedata
+    from dataclasses import dataclass
+
+    _enable_virtual_terminal_processing()
+
+    try:
+        parts = shlex.split(input_str, posix=False)
+    except Exception:
+        parts = input_str.split()
+
+    cmd = (parts[0].lower() if parts else "ls")
+    args = parts[1:]
+
+    detailed = (cmd == "ll")
+    show_all = False
+    one_per_line = False
+    sort_key = "name"
+    reverse = False
+    no_color = False
+    dirs_first = True
+    target = None
+
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "-l":
+            detailed = True
+            i += 1
+            continue
+        if a == "-a":
+            show_all = True
+            i += 1
+            continue
+        if a == "-1":
+            one_per_line = True
+            i += 1
+            continue
+        if a == "-r":
+            reverse = True
+            i += 1
+            continue
+        if a == "--no-color":
+            no_color = True
+            i += 1
+            continue
+        if a == "--no-dirs-first":
+            dirs_first = False
+            i += 1
+            continue
+        if a == "--sort":
+            if i + 1 >= len(args):
+                _print("_13_\n", "red")
+                return
+            sort_key = (args[i + 1] or "").lower()
+            if sort_key not in {"name", "time", "size"}:
+                _print("_13_\n", "red")
+                return
+            i += 2
+            continue
+
+        if a.startswith("-"):
+            _print("_13_\n", "red")
+            return
+
+        # path token
+        if target is not None:
+            _print("_13_\n", "red")
+            return
+        target = a
+        i += 1
+
+    @dataclass(frozen=True)
+    class _Entry:
+        name: str
+        is_dir: bool
+        is_link: bool
+        mode: int
+        size: int
+        mtime: float
+
+    def _display_width(s: str) -> int:
+        w = 0
+        for ch in s:
+            if ch == "\t":
+                w += 4
+                continue
+            if unicodedata.east_asian_width(ch) in {"W", "F"}:
+                w += 2
+            else:
+                w += 1
+        return w
+
+    def _pad(s: str, width: int) -> str:
+        return s + (" " * max(width - _display_width(s), 0))
+
+    def _human_size(num: int) -> str:
+        n = float(num)
+        units = ["B", "K", "M", "G", "T", "P"]
+        idx = 0
+        while n >= 1024 and idx < len(units) - 1:
+            n /= 1024
+            idx += 1
+        if idx == 0:
+            return f"{int(n)}{units[idx]}"
+        if n >= 10:
+            return f"{n:.0f}{units[idx]}"
+        return f"{n:.1f}{units[idx]}"
+
+    def _format_mtime(ts: float) -> str:
+        return time.strftime("%Y-%m-%d %H:%M", time.localtime(ts))
+
+    def _format_mode(mode: int, is_dir: bool, is_link: bool) -> str:
+        file_type = "d" if is_dir else "l" if is_link else "-"
+        def bit(ch: str, mask: int) -> str:
+            return ch if (mode & mask) else "-"
+        return (
+            file_type
+            + bit("r", stat.S_IRUSR)
+            + bit("w", stat.S_IWUSR)
+            + bit("x", stat.S_IXUSR)
+            + bit("r", stat.S_IRGRP)
+            + bit("w", stat.S_IWGRP)
+            + bit("x", stat.S_IXGRP)
+            + bit("r", stat.S_IROTH)
+            + bit("w", stat.S_IWOTH)
+            + bit("x", stat.S_IXOTH)
+        )
+
+    def _colorize(label: str, e: _Entry) -> str:
+        if no_color:
+            return label
+        blue = "\033[34m"
+        cyan = "\033[36m"
+        green = "\033[32m"
+        dim = "\033[2m"
+        reset = "\033[0m"
+
+        color = ""
+        if e.is_dir:
+            color = blue
+        elif e.is_link:
+            color = cyan
+        elif e.mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH):
+            color = green
+
+        if e.name.startswith("."):
+            color = (dim + color) if color else dim
+
+        return f"{color}{label}{reset}" if color else label
+
+    base = target or os.getcwd()
+    try:
+        if not os.path.exists(base):
+            _print("_4_\n", "red")
+            return
+        if not os.path.isdir(base):
+            _print("_5_\n", "red")
+            return
+    except Exception as e:
+        _print(f"_7_{str(e)}\n", "red")
+        return
+
+    entries: list[_Entry] = []
+    try:
+        with os.scandir(base) as it:
+            for de in it:
+                if (not show_all) and de.name.startswith("."):
+                    continue
+                try:
+                    st = de.stat(follow_symlinks=False)
+                    entries.append(
+                        _Entry(
+                            name=de.name,
+                            is_dir=de.is_dir(follow_symlinks=False),
+                            is_link=de.is_symlink(),
+                            mode=st.st_mode,
+                            size=int(getattr(st, "st_size", 0) or 0),
+                            mtime=float(getattr(st, "st_mtime", 0.0) or 0.0),
+                        )
+                    )
+                except Exception:
+                    continue
+    except PermissionError:
+        _print("_6_\n", "red")
+        return
+    except Exception as e:
+        _print(f"_7_{str(e)}\n", "red")
+        return
+
+    def key_value(e: _Entry):
+        if sort_key == "time":
+            return e.mtime
+        if sort_key == "size":
+            return e.size
+        return e.name.casefold()
+
+    def combined_key(e: _Entry):
+        prefix = 0
+        if dirs_first:
+            prefix = 0 if e.is_dir else 1
+        return (prefix, key_value(e))
+
+    entries = sorted(entries, key=combined_key, reverse=reverse)
+
+    if detailed:
+        size_strs = [_human_size(e.size) for e in entries]
+        size_w = max((len(s) for s in size_strs), default=1)
+        for e, size_s in zip(entries, size_strs):
+            suffix = "/" if e.is_dir else "@" if e.is_link else ""
+            name = _colorize(f"{e.name}{suffix}", e)
+            _print(f"{_format_mode(e.mode, e.is_dir, e.is_link)} {size_s:>{size_w}} {_format_mtime(e.mtime)} {name}\n")
+        return
+
+    # short listing
+    labels_plain: list[str] = []
+    labels_colored: list[str] = []
+    widths: list[int] = []
+    for e in entries:
+        suffix = "/" if e.is_dir else "@" if e.is_link else ""
+        plain = f"{e.name}{suffix}"
+        labels_plain.append(plain)
+        labels_colored.append(_colorize(plain, e))
+        widths.append(_display_width(plain))
+
+    if one_per_line:
+        for s in labels_colored:
+            _print(s + "\n")
+        return
+
+    try:
+        term_cols, _ = os.get_terminal_size()
+        term_cols = max(int(term_cols), 20)
+    except Exception:
+        term_cols = 80
+
+    if not labels_plain:
+        _print("\n")
+        return
+
+    maxw = min(max(widths), 60)
+    colw = maxw + 2
+    ncols = max(1, term_cols // colw)
+    nrows = (len(labels_plain) + ncols - 1) // ncols
+
+    for r in range(nrows):
+        parts = []
+        for c in range(ncols):
+            idx = c * nrows + r
+            if idx >= len(labels_plain):
+                continue
+            plain = labels_plain[idx]
+            colored = labels_colored[idx]
+            if _display_width(plain) > maxw:
+                keep = maxw - 1
+                cut = plain
+                while _display_width(cut) > keep and len(cut) > 0:
+                    cut = cut[1:]
+                short_plain = "…" + cut
+                colored = _colorize(short_plain, entries[idx])
+            parts.append(_pad(colored, maxw) + "  ")
+        _print("".join(parts).rstrip() + "\n")
 
 #输出当前工作路径
 def pwd():
@@ -763,12 +1192,9 @@ def command(input_str):
         else:
             _print("_8_\n")
     elif command.lower() == "ls":
-        if "-l" in input_list:
-            ls(detailed=True)
-        else:
-            ls()
+        ls_cmd(input_str)
     elif command.lower() == "ll":
-        ls(detailed=True)
+        ls_cmd(input_str)
     elif command.lower() == "pwd":
         pwd()
     elif command.lower() == "help":
