@@ -738,6 +738,18 @@ def command(input_str):
     input_list = input_str.split()
     if len(input_list) == 0:
         return
+
+    # 全局帮助后缀：任意命令后携带 --help 等同于 help <命令名>
+    # 例：ls --help  => help ls
+    #     pck list --help => help pck
+    if input_list[-1].lower() == "--help":
+        if len(input_list) == 1:
+            input_str = "help"
+            input_list = ["help"]
+        else:
+            input_str = f"help {input_list[0]}"
+            input_list = ["help", input_list[0]]
+
     command = input_list[0]
     if command.lower() == "version":
         _print(get_about() + "\n")
