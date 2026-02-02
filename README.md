@@ -72,6 +72,17 @@ python main.py img test
 python main.py video test --fps 15
 ```
 
+### 启动时工作目录（cwd）行为
+
+- 交互模式（无参数启动）：默认 `cd` 到用户 HOME 目录（更像普通 shell 的体验）
+- 非交互模式（带参数或 `-r`）：默认 `cd` 到 `main.py` 所在目录（方便从任意目录执行时使用项目相对路径）
+
+可用参数覆盖默认行为：
+
+- `--cd-script` / `--cd-script-dir`：启动时切到脚本目录
+- `--cd-home`：启动时切到 HOME
+- `--no-cd` / `--keep-cwd`：不改变当前工作目录
+
 ### 批处理模式（-r）
 
 ```bash
