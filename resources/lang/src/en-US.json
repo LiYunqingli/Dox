@@ -120,14 +120,23 @@
             "msg": "ls\t(list directory contents)",
             "usage": {
                 "ls": "List files in current directory",
-                "ls -l": "List files in detail"
+                "ls -l": "List files in detail",
+                "ls -a": "Include hidden (dot) files",
+                "ls -1": "One entry per line",
+                "ls --sort name|time|size": "Sort by name/time/size (default: name)",
+                "ls -r": "Reverse sort",
+                "ls --no-color": "Disable ANSI colors",
+                "ls [path]": "List a specific directory"
             }
         },
         {
             "name": "LL",
             "msg": "ll\t(list directory contents)",
             "usage": {
-                "ll": "List files in detail (same as ls -l)"
+                "ll": "List files in detail (same as ls -l)",
+                "ll -a": "Include hidden (dot) files",
+                "ll --no-color": "Disable ANSI colors",
+                "ll [path]": "List a specific directory"
             }
         },
         {
