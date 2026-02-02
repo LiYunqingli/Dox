@@ -92,7 +92,7 @@ def donghua():
                 time.sleep(0.001)
     print("\n")
 
-#清楚屏幕内容
+#清除屏幕内容
 def clear():
     """清屏"""
     import os
@@ -480,11 +480,12 @@ def pck(input_str):
         else:
             _print("_19_" + items[0] + "\n") #非法的pck参数
 
+# 修改配置文件
 def set_config(input_str):
-    _print("设置配置文件")
+    _print("设置配置文件\n")
     pass
 
-# rm 删除陌路或者文件
+# rm 删除文件或者目录
 def rm(paths, recursive=False, force=False):
     """删除文件或目录
     Args:
