@@ -6,14 +6,10 @@ from lib.lib import load, _print, command#,  clear
 import os
 import sys
 
-readline_loaded = False
 if sys.platform == "linux":
     try:
         import readline
-        # 仅在导入成功后配置退格键
-        readline.parse_and_bind('"\b": backward-delete-char')
-        readline.parse_and_bind('"\C-h": backward-delete-char')
-        readline_loaded = True
+        
     except (ImportError, ModuleNotFoundError, Exception):
         # 捕获所有导入相关异常，静默跳过（也可添加日志提示）
         pass
