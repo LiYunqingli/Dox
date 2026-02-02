@@ -37,7 +37,21 @@
         "29": "Delete failed: %s (%s)",
         "30": "Error: Missing parameter, Usage: rm [options] file ..",
         "31": "Error: No file or directory specified for deletion",
-        "32": "Do you want to install all the above software packages? (y/n)"
+        "32": "Do you want to install all the above software packages? (y/n)",
+        "33": "Please provide a package name",
+        "34": "Usage: set <key> <value> (key is under Config; dot path supported, e.g. Pck.Name)",
+        "35": "Config item '%s' already exists",
+        "36": "Current value: %s",
+        "37": "New value: %s",
+        "38": "Confirm change '%s'? (y/n) ",
+        "39": "Config item '%s' does not exist",
+        "40": "Will create and write: %s",
+        "41": "Create '%s' and write it? (y/n) ",
+        "42": "Config updated: %s",
+        "43": "Cancelled",
+        "44": "Error: cannot set child under '%s' (not an object)",
+        "45": "Error: Config is not an object; cannot set",
+        "46": "Error: failed to write config file: %s"
     },
     "help": [
         {
