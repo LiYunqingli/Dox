@@ -1240,6 +1240,9 @@ def command(input_str):
     elif command.lower() == "update":
         from lib.src.update import update
         update()
+    elif command.lower() == "dox":
+        path = get_run_path() + "/../resources/img/dox.png"
+        img(f'img "{path}"')
     else:
         _print("_2_" + command + "\n")
 
