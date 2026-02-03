@@ -8,10 +8,11 @@
         "Pck": {
             "Name": "Dox_pck_server",
             "Addr": "http://127.0.0.1:8081/"
-        }
+        },
+        "RunStyle": "script"
     },
     "Update": {
-        "Auto_Check": true,
-        "Latest_Version_URL": "http://8.138.142.121/LiHuarong/Dox/raw/branch/main/latest_version"
+        "AutoCheck": true,
+        "LatestVersionURL": "http://8.138.142.121/LiHuarong/Dox/raw/branch/main/latest_version"
     }
 }
