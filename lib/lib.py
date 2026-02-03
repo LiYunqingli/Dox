@@ -1237,6 +1237,9 @@ def command(input_str):
         env_cmd(input_str)
     elif command.lower() == "set":
         set_config(input_str)
+    elif command.lower() == "update":
+        from lib.src.update import update
+        update()
     else:
         _print("_2_" + command + "\n")
 
