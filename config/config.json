@@ -3,11 +3,15 @@
         "Version": "0.0.2",
         "Time": "2026.02.01 22:33:35"
     },
-    "Config":{
-        "Lang" : "zh-CN",
-        "Pck" : {
-            "Name" : "Dox_pck_server",
-            "Addr" : "http://127.0.0.1:8081/"
+    "Config": {
+        "Lang": "zh-CN",
+        "Pck": {
+            "Name": "Dox_pck_server",
+            "Addr": "http://127.0.0.1:8081/"
         }
+    },
+    "Update": {
+        "Auto_Check": true,
+        "Latest_Version_URL": "http://8.138.142.121/LiHuarong/Dox/raw/branch/main/latest_version"
     }
 }
