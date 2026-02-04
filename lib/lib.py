@@ -2,6 +2,10 @@
 所有常用的方法封装的地方，如需添加新的方法，请注意规范且编写注释
 """
 
+
+_config = None
+
+
 #初始化控制台，载入信息
 def load():
     config = get_config()
@@ -12,11 +16,13 @@ def load():
 
 #获取配置文件的信息
 def get_config():
-    config_file_path = get_run_path() + "/../config/config.json"
-    import json
-    with open(config_file_path, 'r', encoding='utf-8') as f:
-        config = json.load(f)
-    return config
+    global _config
+    if _config == None:
+        config_file_path = get_run_path() + "/../config/config.json"
+        import json
+        with open(config_file_path, 'r', encoding='utf-8') as f:
+            _config = json.load(f)
+    return _config
 
 #获取main.py所在的路径
 def get_run_path():
