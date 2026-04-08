@@ -950,10 +950,7 @@ def set_config(input_str):
         _print("_34_\n", "red")
         return
 
-    raw_key_path = (parts[1] or "").strip()
-    if raw_key_path.lower().startswith("config."):
-        raw_key_path = raw_key_path[7:]
-    key_path = raw_key_path.strip(".")
+    key_path = (parts[1] or "").strip().strip(".")
     if not key_path:
         _print("_34_\n", "red")
         return
@@ -962,10 +959,7 @@ def set_config(input_str):
     new_value = parse_value(value_str)
 
     config = get_config()
-    if not isinstance(config.get("Config"), dict):
-        _print("_45_\n", "red")
-        return
-    config_root = config["Config"]
+    config_root = config
 
     segments = [seg for seg in key_path.split(".") if seg]
     if not segments:

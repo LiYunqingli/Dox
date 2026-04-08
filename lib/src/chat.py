@@ -25,8 +25,8 @@ def chat_cmd(input_str):
     api_key = ai_config.get("API_KEY", "")
     
     if not api_key:
-        _print("未找到 API_KEY。\n请在 'config/config.json' 中配置 AI 节点的 'API_KEY'！\n", "red")
-        _print("例如设置免费的 DeepSeek、Kimi 或者本地 Ollama 的 API 信息。\n", "yellow")
+        _print("未找到 API_KEY。\n请在终端中使用命令配置，例如: set AI.API_KEY sk-xxxxx\n", "red")
+        _print("你也可以设置免费的 DeepSeek、Kimi 或者本地 Ollama 的 API 信息。\n", "yellow")
         return
         
     api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
