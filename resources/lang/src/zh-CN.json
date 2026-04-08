@@ -1,8 +1,8 @@
 {
     "about": {
-        "version": "0.0.1",
+        "version": "0.0.3",
         "author": "Yunqingli",
-        "date": "2025.4.26 16:54:52"
+        "date": "2026.4.8 15:26:55"
     },
     "msg": {
         "0": "欢迎使用Dox-python ",
@@ -39,7 +39,7 @@
         "31": "错误：未指定要删除的文件或目录",
         "32": "是否安装以上所有软件包？(y/n)",
         "33": "需要您提供一个包名",
-        "34": "用法：set <key> <value>（key 位于 Config 下，支持点号路径，如 Pck.Name）",
+        "34": "用法：set <key> <value>（支持点号路径，如 Config.Lang、AI.API_KEY 等）",
         "35": "配置项 '%s' 已存在",
         "36": "原值：%s",
         "37": "将修改为：%s",
@@ -50,7 +50,7 @@
         "42": "已写入配置：%s",
         "43": "已取消",
         "44": "错误：无法在 '%s' 下写入子项（当前不是对象）",
-        "45": "错误：Config 字段不是对象，无法 set",
+        "45": "错误：根节点不是对象，无法 set",
         "46": "错误：写入配置文件失败：%s",
         "47": "当前 PATH（临时+永久）：%s",
         "48": "永久 PATH 条目数：%s",
@@ -211,11 +211,12 @@
         },
         {
             "name": "SET",
-            "msg": "set\t(修改配置 Config)",
+            "msg": "set\t(修改配置)",
             "usage": {
-                "set [key] [value]": "修改 config.json 的 Config 下的配置项（支持点号路径，如 Pck.Name）",
-                "set Lang zh-CN": "切换语言",
-                "set Pck.Addr http://127.0.0.1:8081/": "设置 pck 服务器地址"
+                "set [key] [value]": "修改 config.json 根节点下的配置项（支持点号路径，如 Config.Lang）",
+                "set Config.Lang zh-CN": "切换语言为简体中文",
+                "set Config.Pck.Addr http://127.0.0.1:8081/": "设置 pck 服务器地址",
+                "set AI.API_KEY sk-xxxxx": "设置AI的API KEY标识"
             }
         },
         {
