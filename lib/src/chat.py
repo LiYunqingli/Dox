@@ -46,13 +46,18 @@ def chat_cmd(input_str):
     api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
     model = ai_config.get("Model", "deepseek-chat")
 
+    # 读取角色文件
+    from lib.src.prompt import load_role_prompt
+
     # role = system 的意思是给ai设定角色背景信息以及行为准则
     messages = [
         {
             "role": "system",
-            "content": "你是由 Dox 项目嵌入的本地终端 AI 助手，回答应该简短、准确，并在可能的情况下返回可以被直接执行的命令行指令。",
+            "content": load_role_prompt("dox"),
         }
     ]
+
+    print(messages[0]["content"])
 
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
