@@ -71,7 +71,10 @@
         "63": "Error: failed to read path.json: %s",
         "64": "Error: failed to write path.json: %s",
         "65": "Unknown subcommand: %s",
-        "66": "%s=%s"
+        "66": "%s=%s",
+        "67": "API_KEY not found.",
+        "68": "Please configure it using commands in the terminal",
+        "69": "You can also set up free API information compatible with DeepSeek, Kimi, local Ollama, and other third-party APIs."
     },
     "help": [
         {
