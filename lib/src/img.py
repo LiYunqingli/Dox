@@ -70,7 +70,9 @@ def image_in_cmd(
 
     if target_width > cols:
         target_width = cols
-        target_height = int(target_width / aspect_ratio) if aspect_ratio != 0 else target_height
+        target_height = (
+            int(target_width / aspect_ratio) if aspect_ratio != 0 else target_height
+        )
 
     # Ensure an even pixel height (paired rows for ▀)
     target_height = max((target_height // 2) * 2, 2)
@@ -106,6 +108,7 @@ def image_in_cmd(
             lower = pixels[x, y + 1] if y + 1 < target_height else (0, 0, 0)
 
             if grayscale:
+
                 def luma(rgb):
                     return int(0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2])
 

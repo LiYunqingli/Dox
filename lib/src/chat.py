@@ -3,65 +3,74 @@ import json
 import requests
 from lib.lib import _print, get_config, get_run_path
 
+
+# 如果config.json中没有关于AI的配置，将调用函数里补充AI配置
 def _save_config(config):
     config_file_path = get_run_path() + "/../config/config.json"
-    with open(config_file_path, 'w', encoding='utf-8') as f:
+    with open(config_file_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
+
 
 def chat_cmd(input_str):
     input_list = input_str.split(" ", 1)
-    
     config = get_config()
-    # 如果 config.json 中没有 AI 配置，默认补充 DeepSeek / OpenAI 兼容格式
+
     if "AI" not in config:
         config["AI"] = {
             "API_URL": "https://api.deepseek.com/chat/completions",
             "API_KEY": "",
-            "Model": "deepseek-chat"
+            "Model": "deepseek-chat",
         }
         _save_config(config)
-    
+
     ai_config = config["AI"]
     api_key = ai_config.get("API_KEY", "")
-    
+
     if not api_key:
-        _print("未找到 API_KEY。\n请在终端中使用命令配置，例如: set AI.API_KEY sk-xxxxx\n", "red")
-        _print("你也可以设置免费的 DeepSeek、Kimi 或者本地 Ollama 的 API 信息。\n", "yellow")
+        _print(
+            "未找到 API_KEY。\n请在终端中使用命令配置，例如: set AI.API_KEY sk-xxxxx\n",
+            "red",
+        )
+        _print(
+            "你也可以设置免费的 DeepSeek、Kimi 或者本地 Ollama 的 API 信息。\n",
+            "yellow",
+        )
         return
-        
+
     api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
     model = ai_config.get("Model", "deepseek-chat")
-    
+
     messages = [
-        {"role": "system", "content": "你是由 Dox 项目嵌入的本地终端 AI 助手，回答应该简短、准确，并在可能的情况下返回可以被直接执行的命令行指令。"}
+        {
+            "role": "system",
+            "content": "你是由 Dox 项目嵌入的本地终端 AI 助手，回答应该简短、准确，并在可能的情况下返回可以被直接执行的命令行指令。",
+        }
     ]
-    
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    }
-    
+
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+
     def ask_ai(msgs, stream=False):
         try:
-            payload = {
-                "model": model,
-                "messages": msgs,
-                "stream": stream
-            }
-            response = requests.post(api_url, json=payload, headers=headers, timeout=30, stream=stream)
+            payload = {"model": model, "messages": msgs, "stream": stream}
+            response = requests.post(
+                api_url, json=payload, headers=headers, timeout=30, stream=stream
+            )
             if response.status_code == 200:
                 if stream:
                     full_answer = ""
                     for line in response.iter_lines():
                         if line:
-                            decoded_line = line.decode('utf-8')
+                            decoded_line = line.decode("utf-8")
                             if decoded_line.startswith("data: "):
                                 data_str = decoded_line[6:]
                                 if data_str == "[DONE]":
                                     break
                                 try:
                                     data_json = json.loads(data_str)
-                                    if "choices" in data_json and len(data_json["choices"]) > 0:
+                                    if (
+                                        "choices" in data_json
+                                        and len(data_json["choices"]) > 0
+                                    ):
                                         delta = data_json["choices"][0].get("delta", {})
                                         content = delta.get("content", "")
                                         if content:
@@ -102,7 +111,7 @@ def chat_cmd(input_str):
                 _print("[Dox AI] ", "green")
                 ans = ask_ai(messages, stream=True)
                 messages.append({"role": "assistant", "content": ans})
-                
+
             except (KeyboardInterrupt, EOFError):
                 break
         _print("\n退出 Dox AI。\n", "yellow")

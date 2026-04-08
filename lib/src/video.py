@@ -114,11 +114,15 @@ def video_in_cmd(
         target_width = int(target_height * aspect_ratio) if aspect_ratio else cols
         if target_width > cols:
             target_width = cols
-            target_height = int(target_width / aspect_ratio) if aspect_ratio else target_height
+            target_height = (
+                int(target_width / aspect_ratio) if aspect_ratio else target_height
+            )
 
         target_height = max((target_height // 2) * 2, 2)
         target_height = min(target_height, rows * 2)
-        target_width = max(1, min(int(target_height * aspect_ratio) if aspect_ratio else cols, cols))
+        target_width = max(
+            1, min(int(target_height * aspect_ratio) if aspect_ratio else cols, cols)
+        )
 
         # Hide cursor once
         print(f"{chr(27)}[?25l", end="")
@@ -134,7 +138,9 @@ def video_in_cmd(
                 break
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(frame).resize((target_width, target_height), Image.BILINEAR)
+            img = Image.fromarray(frame).resize(
+                (target_width, target_height), Image.BILINEAR
+            )
 
             if no_color:
                 img = img.convert("L")

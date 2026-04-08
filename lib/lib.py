@@ -2,11 +2,10 @@
 所有常用的方法封装的地方，如需添加新的方法，请注意规范且编写注释
 """
 
-
 _config = None
 
 
-#初始化控制台，载入信息
+# 初始化控制台，载入信息
 def load():
     config = get_config()
     version = config["About"]["Version"]
@@ -14,20 +13,25 @@ def load():
     _print("_1_\n")
     _print()
 
-#获取配置文件的信息
+
+# 获取配置文件的信息
 def get_config():
     global _config
     if _config == None:
         config_file_path = get_run_path() + "/../config/config.json"
         import json
-        with open(config_file_path, 'r', encoding='utf-8') as f:
+
+        with open(config_file_path, "r", encoding="utf-8") as f:
             _config = json.load(f)
     return _config
 
-#获取main.py所在的路径
+
+# 获取main.py所在的路径
 def get_run_path():
     import os
+
     return os.path.dirname(os.path.abspath(__file__))
+
 
 # 获取当前语言设置
 def get_lang():
@@ -35,7 +39,8 @@ def get_lang():
     lang = config["Config"]["Lang"]
     return lang
 
-#基于print的封装，根据本地语言设置输出对应语言的信息
+
+# 基于print的封装，根据本地语言设置输出对应语言的信息
 def _print(input_str="\n", color=None, items=[]):
     import json
     import re
@@ -45,7 +50,7 @@ def _print(input_str="\n", color=None, items=[]):
         _enable_virtual_terminal_processing()
     except Exception:
         pass
-    
+
     COLORS = {
         "black": "\033[30m",
         "red": "\033[31m",
@@ -56,29 +61,31 @@ def _print(input_str="\n", color=None, items=[]):
         "cyan": "\033[36m",
         "white": "\033[37m",
         "reset": "\033[0m",  # 重置颜色
-        "bold": "\033[1m",   # 加粗
+        "bold": "\033[1m",  # 加粗
         "underline": "\033[4m",
     }
-    
+
     color_code = COLORS.get(color, "")
     reset_code = COLORS["reset"] if color else ""
-    
+
     lang = get_lang()
     lang_file_path = f"{get_run_path()}/../resources/lang/src/{lang}.json"
-    
+
     try:
-        with open(lang_file_path, 'r', encoding='utf-8') as f:
+        with open(lang_file_path, "r", encoding="utf-8") as f:
             lang_data = json.load(f)["msg"]
-        pattern = re.compile(r'_(\d+)_')
+        pattern = re.compile(r"_(\d+)_")
+
         def replace_match(match):
             key = match.group(1)
             return lang_data.get(key, match.group(0))
+
         output_str = pattern.sub(replace_match, input_str)
 
-        #现在格式化其中的%s，按照顺序讲items中的值替换进去
+        # 现在格式化其中的%s，按照顺序讲items中的值替换进去
         output_str = output_str % tuple(items)
 
-        print(f"{color_code}{output_str}{reset_code}", end='')
+        print(f"{color_code}{output_str}{reset_code}", end="")
     except FileNotFoundError:
         print(f"Error: Language file not found at {lang_file_path}")
     except json.JSONDecodeError:
@@ -86,29 +93,36 @@ def _print(input_str="\n", color=None, items=[]):
     except Exception as e:
         print(f"Error: {str(e)}")
 
-#获取关于信息
+
+# 获取关于信息
 def get_about():
     config = get_config()
     about = config["About"]
     return str(about)
 
-#加载动画
+
+# 加载动画
 def donghua():
     """打印动画"""
     import time
     import random
-    with open(get_run_path() + "/../resources/donghua/donghua", "r", encoding="utf-8") as f:
+
+    with open(
+        get_run_path() + "/../resources/donghua/donghua", "r", encoding="utf-8"
+    ) as f:
         for line in f:
             for char in line:
                 print(f"\033[38;5;{random.randint(0, 255)}m{char}\033[0m", end="")
                 time.sleep(0.001)
     print("\n")
 
-#清除屏幕内容
+
+# 清除屏幕内容
 def clear():
     """清屏"""
     import os
-    os.system('cls' if os.name == 'nt' else 'clear')
+
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 _VT_ENABLED = False
@@ -122,6 +136,7 @@ def _enable_virtual_terminal_processing() -> None:
     _VT_ENABLED = True
 
     import os
+
     if os.name != "nt":
         return
 
@@ -140,7 +155,8 @@ def _enable_virtual_terminal_processing() -> None:
     except Exception:
         return
 
-#打印帮助信息（自动根据语言设置选择对应的语言包）
+
+# 打印帮助信息（自动根据语言设置选择对应的语言包）
 def help(input_str):
     """显示帮助信息"""
     items = input_str.split()
@@ -148,8 +164,9 @@ def help(input_str):
 
     def help_print(help_id):
         import json
+
         lang_file_path = f"{get_run_path()}/../resources/lang/src/{get_lang()}.json"
-        with open(lang_file_path, 'r', encoding='utf-8') as f:
+        with open(lang_file_path, "r", encoding="utf-8") as f:
             help_data = json.load(f)["help"]
         if help_id == "ALL":
             _print("\n_12_\n\n")
@@ -159,7 +176,7 @@ def help(input_str):
                 # for usage_item in help_item["usage"]:
                 #     print(f"{usage_item}：{help_item['usage'][usage_item]}")
                 # print("\n")
-                
+
                 # _print(f"{help_item['name']}","bold")#加粗命令
                 print(f"{help_item['msg']}")
             print("\n")
@@ -171,7 +188,9 @@ def help(input_str):
                     print(help_item["msg"] + "\n")
                     for usage_item in help_item["usage"]:
                         print(f"{usage_item}：{help_item['usage'][usage_item]}")
-                    print("--------------------------------------------------------------------------------------\n")
+                    print(
+                        "--------------------------------------------------------------------------------------\n"
+                    )
                     found = True
                     break
             if not found:
@@ -184,10 +203,12 @@ def help(input_str):
             # 将参数转换为大写以匹配JSON中的命令名称
             help_print(item.upper())
 
-#进入一个新的目录
+
+# 进入一个新的目录
 def cd(path):
     """改变当前工作目录"""
     import os
+
     try:
         os.chdir(path)
     except FileNotFoundError:
@@ -199,7 +220,8 @@ def cd(path):
     except Exception as e:
         _print(f"_7_{str(e)}\n")
 
-#列出目录内容（仿Linux）
+
+# 列出目录内容（仿Linux）
 def ls(detailed=False):
     """列出当前目录内容（更清爽的输出）
 
@@ -261,8 +283,10 @@ def ls(detailed=False):
 
     def _format_mode(mode: int, is_dir: bool, is_link: bool) -> str:
         file_type = "d" if is_dir else "l" if is_link else "-"
+
         def bit(ch: str, mask: int) -> str:
             return ch if (mode & mask) else "-"
+
         return (
             file_type
             + bit("r", stat.S_IRUSR)
@@ -330,7 +354,9 @@ def ls(detailed=False):
             for e, size_s in zip(entries, size_strs):
                 suffix = "/" if e.is_dir else "@" if e.is_link else ""
                 name = _colorize(f"{e.name}{suffix}", e)
-                _print(f"{_format_mode(e.mode, e.is_dir, e.is_link)} {size_s:>{size_w}} {_format_mtime(e.mtime)} {name}\n")
+                _print(
+                    f"{_format_mode(e.mode, e.is_dir, e.is_link)} {size_s:>{size_w}} {_format_mtime(e.mtime)} {name}\n"
+                )
             return
 
         # Short listing (grid)
@@ -411,10 +437,10 @@ def ls_cmd(input_str: str) -> None:
     except Exception:
         parts = input_str.split()
 
-    cmd = (parts[0].lower() if parts else "ls")
+    cmd = parts[0].lower() if parts else "ls"
     args = parts[1:]
 
-    detailed = (cmd == "ll")
+    detailed = cmd == "ll"
     show_all = False
     one_per_line = False
     sort_key = "name"
@@ -514,8 +540,10 @@ def ls_cmd(input_str: str) -> None:
 
     def _format_mode(mode: int, is_dir: bool, is_link: bool) -> str:
         file_type = "d" if is_dir else "l" if is_link else "-"
+
         def bit(ch: str, mask: int) -> str:
             return ch if (mode & mask) else "-"
+
         return (
             file_type
             + bit("r", stat.S_IRUSR)
@@ -611,7 +639,9 @@ def ls_cmd(input_str: str) -> None:
         for e, size_s in zip(entries, size_strs):
             suffix = "/" if e.is_dir else "@" if e.is_link else ""
             name = _colorize(f"{e.name}{suffix}", e)
-            _print(f"{_format_mode(e.mode, e.is_dir, e.is_link)} {size_s:>{size_w}} {_format_mtime(e.mtime)} {name}\n")
+            _print(
+                f"{_format_mode(e.mode, e.is_dir, e.is_link)} {size_s:>{size_w}} {_format_mtime(e.mtime)} {name}\n"
+            )
         return
 
     # short listing
@@ -663,13 +693,16 @@ def ls_cmd(input_str: str) -> None:
             parts.append(_pad(colored, maxw) + "  ")
         _print("".join(parts).rstrip() + "\n")
 
-#输出当前工作路径
+
+# 输出当前工作路径
 def pwd():
     """返回当前路径"""
     import os
+
     _print("\n" + os.getcwd() + "\n\n")
 
-#指定一个路径在控制台播放视频
+
+# 指定一个路径在控制台播放视频
 def video(input_str):
     """在终端播放视频（低分辨率渲染）
 
@@ -772,6 +805,7 @@ def video(input_str):
 
     try:
         from lib.src.video import video_in_cmd
+
         video_in_cmd(
             path,
             max_width=max_width,
@@ -784,6 +818,7 @@ def video(input_str):
         )
     except Exception as e:
         _print(f"\n_7_{str(e)}\n\n", "red")
+
 
 # 指定一个路径在控制台显示图片（低分辨率）
 def img(input_str):
@@ -872,34 +907,45 @@ def img(input_str):
         return
 
     from lib.src.img import image_in_cmd
-    image_in_cmd(path, max_width=max_width, max_height=max_height, grayscale=grayscale, no_color=no_color)
 
-#软件包管理器
+    image_in_cmd(
+        path,
+        max_width=max_width,
+        max_height=max_height,
+        grayscale=grayscale,
+        no_color=no_color,
+    )
+
+
+# 软件包管理器
 def pck(input_str):
-    items = input_str.split()[1:] # 去除命令本身
+    items = input_str.split()[1:]  # 去除命令本身
     if len(items) == 0:
-        _print("_16_\n")#至少需要一个参数
+        _print("_16_\n")  # 至少需要一个参数
     else:
         if items[0] == "install":
             items = items[1:]
             from lib.src.pck import pck_install
+
             if len(items) == 0:
-                _print("_17_\n")#最少需要一个包名
+                _print("_17_\n")  # 最少需要一个包名
             elif "-y" in items:
                 items.remove("-y")
                 pck_install(items, False)
             else:
-                #询问安装
+                # 询问安装
                 pck_install(items, True)
         elif items[0] == "update":
             from lib.src.pck import pck_update
+
             items = items[1:]
             if len(items) != 0:
-                _print("_18_\n")#pck update 用法错误（携带参数非法）
+                _print("_18_\n")  # pck update 用法错误（携带参数非法）
             else:
                 pck_update()
         elif items[0] == "list":
             from lib.src.pck import pck_list
+
             items = items[1:]
             if len(items) != 0:
                 _print("_18_\n")
@@ -911,9 +957,11 @@ def pck(input_str):
                 _print("_33_\n")
             else:
                 from lib.src.pck import pck_search
+
                 pck_search(items[0], isOutPut=True)
         else:
-            _print("_19_" + items[0] + "\n") #非法的pck参数
+            _print("_19_" + items[0] + "\n")  # 非法的pck参数
+
 
 # 修改配置文件
 def set_config(input_str):
@@ -1036,6 +1084,7 @@ def set_config(input_str):
     except Exception as e:
         _print("_46_\n", "red", [str(e)])
 
+
 # rm 删除文件或者目录
 def rm(paths, recursive=False, force=False):
     """删除文件或目录
@@ -1046,6 +1095,7 @@ def rm(paths, recursive=False, force=False):
     """
     import os
     import shutil
+
     for path in paths:
         # 检查路径是否存在
         if not os.path.exists(path):
@@ -1058,7 +1108,7 @@ def rm(paths, recursive=False, force=False):
                 if not force:
                     _print("_22_\n", "yellow", [path])  # 确认删除文件
                     confirm = input().strip().lower()
-                    if confirm != 'y':
+                    if confirm != "y":
                         _print("_24_\n")  # 取消删除
                         continue
                 os.remove(path)
@@ -1072,9 +1122,9 @@ def rm(paths, recursive=False, force=False):
                 continue
             try:
                 if not force:
-                    _print("_27_\n","yellow",[path])  # 确认删除目录
+                    _print("_27_\n", "yellow", [path])  # 确认删除目录
                     confirm = input().strip().lower()
-                    if confirm != 'y':
+                    if confirm != "y":
                         _print("_24_\n")
                         continue
                 shutil.rmtree(path, ignore_errors=force)  # 强制模式下忽略错误
@@ -1085,7 +1135,8 @@ def rm(paths, recursive=False, force=False):
         else:
             _print("_28_\n", "red", [path])  # 未知类型
 
-#下载文件(高级版本，支持动态显示下载过程，不支持断点续传)
+
+# 下载文件(高级版本，支持动态显示下载过程，不支持断点续传)
 def download(file_url, file_path):
     import requests
     import os
@@ -1108,7 +1159,7 @@ def download(file_url, file_path):
     def human_readable_size(size_bytes):
         if size_bytes <= 0:
             return "0B"
-        units = ['B', 'KB', 'MB', 'GB', 'TB']
+        units = ["B", "KB", "MB", "GB", "TB"]
         unit_index = 0
         size = size_bytes
         while size >= 1024 and unit_index < len(units) - 1:
@@ -1129,10 +1180,10 @@ def download(file_url, file_path):
     try:
         r = requests.get(file_url, stream=True)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        total_size = int(r.headers.get('Content-Length', 0))
+        total_size = int(r.headers.get("Content-Length", 0))
         downloaded = 0
         start_time = time.time()
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8):
                 if chunk:
                     f.write(chunk)
@@ -1146,21 +1197,30 @@ def download(file_url, file_path):
                         percent = downloaded / total_size * 100
                         progress_width = 20
                         filled = int(progress_width * percent / 100)
-                        bar = '=' * filled + '>' + ' ' * (progress_width - filled - 1) if filled < progress_width else '=' * progress_width
+                        bar = (
+                            "=" * filled + ">" + " " * (progress_width - filled - 1)
+                            if filled < progress_width
+                            else "=" * progress_width
+                        )
                         human_total = human_readable_size(total_size)
-                        remaining_time = (total_size - downloaded) / speed if speed > 0 else 0
-                        eta_str = format_time(remaining_time) if speed > 0 else '--:--'
+                        remaining_time = (
+                            (total_size - downloaded) / speed if speed > 0 else 0
+                        )
+                        eta_str = format_time(remaining_time) if speed > 0 else "--:--"
                         progress_line = f"\r{percent:.1f}% [{bar}] {human_downloaded}/{human_total} {speed_h} Time: {time_str} ETA: {eta_str}"
                     else:
                         progress_line = f"\rDownloaded: {human_downloaded} at {speed_h} Time: {time_str}"
-                    color_code = COLORS['green']
-                    reset_code = COLORS['reset']
-                    print(f"{color_code}{progress_line}{reset_code}", end='', flush=True)
-            print(f"{COLORS['reset']}\n", end='')
+                    color_code = COLORS["green"]
+                    reset_code = COLORS["reset"]
+                    print(
+                        f"{color_code}{progress_line}{reset_code}", end="", flush=True
+                    )
+            print(f"{COLORS['reset']}\n", end="")
         return True
     except Exception as e:
         _print(f"download() : {str(e)}\n", color="red")
         return False
+
 
 # 处理交互命令
 def command(input_str):
@@ -1185,7 +1245,7 @@ def command(input_str):
     elif command.lower() == "clear":
         clear()
     elif command.lower() == "donghua":
-        donghua() #属于彩蛋，在help文档中不应该记录关于此命令的信息及用法
+        donghua()  # 属于彩蛋，在help文档中不应该记录关于此命令的信息及用法
     elif command.lower() == "cd":
         if len(input_list) > 1:
             cd(input_list[1])
@@ -1219,10 +1279,10 @@ def command(input_str):
         paths = []
         # 解析参数
         for item in items:
-            if item.startswith('-'):
-                if 'r' in item or 'R' in item:
+            if item.startswith("-"):
+                if "r" in item or "R" in item:
                     recursive = True
-                if 'f' in item:
+                if "f" in item:
                     force = True
             else:
                 paths.append(item)
@@ -1239,12 +1299,14 @@ def command(input_str):
         set_config(input_str)
     elif command.lower() == "update":
         from lib.src.update import update
+
         update()
     elif command.lower() == "dox":
         path = get_run_path() + "/../resources/img/dox.png"
         img(f'img "{path}"')
     elif command.lower() == "chat":
         from lib.src.chat import chat_cmd
+
         chat_cmd(input_str)
     else:
         _print("_2_" + command + "\n")
@@ -1287,6 +1349,7 @@ def _load_persistent_env():
 
 def _save_persistent_env(data):
     import json
+
     try:
         with open(_path_json_path(), "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
@@ -1299,6 +1362,7 @@ def _save_persistent_env(data):
 
 def _normalize_path_entry(p: str) -> str:
     import os
+
     p = (p or "").strip().strip('"').strip("'")
     if p == "":
         return ""
@@ -1308,6 +1372,7 @@ def _normalize_path_entry(p: str) -> str:
 
 def _path_key(p: str) -> str:
     import os
+
     return os.path.normcase(os.path.normpath(p))
 
 
@@ -1336,7 +1401,7 @@ def path_cmd(input_str):
         parts = input_str.split()
 
     args = parts[1:]
-    sub = (args[0].lower() if args else "show")
+    sub = args[0].lower() if args else "show"
 
     persistent = _load_persistent_env()
     persistent_path_list = persistent.get("PATH", [])
@@ -1371,7 +1436,9 @@ def path_cmd(input_str):
 
         flags = set(a.lower() for a in args[2:])
         use_temp = ("-t" in flags) or ("--temp" in flags)
-        use_persist = ("-p" in flags) or ("--persist" in flags) or ("--permanent" in flags)
+        use_persist = (
+            ("-p" in flags) or ("--persist" in flags) or ("--permanent" in flags)
+        )
         use_all = ("--all" in flags) or ("-a" in flags)
         if not (use_temp or use_persist or use_all):
             use_persist = True
@@ -1382,7 +1449,9 @@ def path_cmd(input_str):
         if sub == "add":
             added_any = False
             if use_persist:
-                if _path_key(value) in {_path_key(_normalize_path_entry(p)) for p in persistent_path_list}:
+                if _path_key(value) in {
+                    _path_key(_normalize_path_entry(p)) for p in persistent_path_list
+                }:
                     _print("_55_\n", "yellow", [value])
                 else:
                     persistent_path_list.append(value)
@@ -1391,7 +1460,9 @@ def path_cmd(input_str):
                         _print("_53_\n", items=[value])
                         added_any = True
             if use_temp:
-                if _path_key(value) in {_path_key(_normalize_path_entry(p)) for p in temp_path_list}:
+                if _path_key(value) in {
+                    _path_key(_normalize_path_entry(p)) for p in temp_path_list
+                }:
                     _print("_55_\n", "yellow", [value])
                 else:
                     temp_path_list.append(value)
@@ -1407,7 +1478,11 @@ def path_cmd(input_str):
         removed_any = False
         if use_persist:
             before = list(persistent_path_list)
-            persistent_path_list = [p for p in persistent_path_list if _path_key(_normalize_path_entry(p)) != _path_key(value)]
+            persistent_path_list = [
+                p
+                for p in persistent_path_list
+                if _path_key(_normalize_path_entry(p)) != _path_key(value)
+            ]
             if len(before) != len(persistent_path_list):
                 persistent["PATH"] = persistent_path_list
                 if _save_persistent_env(persistent):
@@ -1415,7 +1490,11 @@ def path_cmd(input_str):
                     removed_any = True
         if use_temp:
             before = list(temp_path_list)
-            temp_path_list = [p for p in temp_path_list if _path_key(_normalize_path_entry(p)) != _path_key(value)]
+            temp_path_list = [
+                p
+                for p in temp_path_list
+                if _path_key(_normalize_path_entry(p)) != _path_key(value)
+            ]
             if len(before) != len(temp_path_list):
                 _TEMP_ENV["PATH"] = temp_path_list
                 _print("_57_\n", items=[value])
@@ -1428,7 +1507,9 @@ def path_cmd(input_str):
     if sub == "clear":
         flags = set(a.lower() for a in args[1:])
         use_temp = ("-t" in flags) or ("--temp" in flags)
-        use_persist = ("-p" in flags) or ("--persist" in flags) or ("--permanent" in flags)
+        use_persist = (
+            ("-p" in flags) or ("--persist" in flags) or ("--permanent" in flags)
+        )
         use_all = ("--all" in flags) or ("-a" in flags)
         if use_all:
             use_temp = True
@@ -1459,7 +1540,7 @@ def env_cmd(input_str):
         parts = input_str.split()
 
     args = parts[1:]
-    var = (args[0].upper() if args else "PATH")
+    var = args[0].upper() if args else "PATH"
     if var != "PATH":
         # fallback to actual process env for other vars
         _print("_66_\n", items=[var, os.environ.get(var, "")])
