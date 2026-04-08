@@ -49,3 +49,31 @@ def load_tool_prompt(prompt_name):
     except Exception as e:
         _print(f"Dox chat 警告：工具提示词加载失败: {str(e)}\n", color="yellow")
         return ""
+
+
+def load_help_prompt_for_ai() -> str:
+    from lib.lib import _print, get_lang, get_run_path
+
+    lang = get_lang()
+    lang_file_path = f"{get_run_path()}/../resources/lang/src/{lang}.json"
+    try:
+        with open(lang_file_path, "r", encoding="utf-8") as f:
+            lang_data = json.load(f)
+    except Exception as e:
+        _print(f"Dox chat 警告：读取帮助文档失败: {str(e)}\n", color="yellow")
+        return ""
+
+    help_items = lang_data.get("help", [])
+    lines = []
+    for item in help_items:
+        name = str(item.get("name", "")).strip()
+        msg = str(item.get("msg", "")).strip()
+        usage = item.get("usage", {})
+        if not name:
+            continue
+        lines.append(f"[{name}] {msg}")
+        if isinstance(usage, dict):
+            for k, v in usage.items():
+                lines.append(f"- {k} => {v}")
+
+    return "\n".join(lines).strip()

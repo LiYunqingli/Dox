@@ -121,6 +121,15 @@
             }
         },
         {
+            "name": "?",
+            "msg": "?\t(convert natural language to a command and execute)",
+            "usage": {
+                "? [prompt]": "Send prompt to AI; AI returns one Dox command and executes it immediately",
+                "? switch language to English": "Typically generates and runs set Config.Lang en-US",
+                "? what files are in current directory": "Typically generates and runs ls"
+            }
+        },
+        {
             "name": "LS",
             "msg": "ls\t(list directory contents)",
             "usage": {

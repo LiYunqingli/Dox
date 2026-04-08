@@ -1308,6 +1308,10 @@ def command(input_str):
         from lib.src.chat import chat_cmd
 
         chat_cmd(input_str)
+    elif command == "?":
+        from lib.src.chat import ai_run_cmd
+
+        ai_run_cmd(input_str)
     else:
         _print("_2_" + command + "\n")
 

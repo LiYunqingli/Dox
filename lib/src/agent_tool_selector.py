@@ -10,6 +10,8 @@ from contextlib import redirect_stdout
 
 TOOL_CALL_START = "<DOX_TOOL_CALL>"
 TOOL_CALL_END = "</DOX_TOOL_CALL>"
+CMD_CALL_START = "<DOX_CMD_CALL>"
+CMD_CALL_END = "</DOX_CMD_CALL>"
 SUPPORTED_TOOLS = {"ls", "ll"}
 
 
@@ -104,3 +106,86 @@ def build_tool_result_for_ai(exec_result: dict) -> str:
         "output:\n"
         f"{output}"
     )
+
+
+def extract_command_call(ai_text: str) -> str | None:
+    if not ai_text:
+        return None
+
+    pattern = re.compile(
+        re.escape(CMD_CALL_START) + r"(.*?)" + re.escape(CMD_CALL_END),
+        re.DOTALL,
+    )
+    m = pattern.search(ai_text)
+    if not m:
+        # 兼容AI直接返回命令文本（无标签）的情况
+        text = ai_text.strip()
+        if not text:
+            return None
+        first_line = text.splitlines()[0].strip()
+        if first_line.startswith("`"):
+            first_line = first_line.strip("` ")
+
+        cmd_head = (first_line.split(" ", 1)[0] if first_line else "").lower()
+        allowed = {
+            "set",
+            "ls",
+            "ll",
+            "cd",
+            "pwd",
+            "help",
+            "path",
+            "env",
+            "img",
+            "video",
+            "download",
+            "rm",
+            "update",
+            "dox",
+            "chat",
+            "version",
+            "clear",
+            "pck",
+        }
+        if cmd_head in allowed:
+            return first_line
+        return None
+
+    payload = (m.group(1) or "").strip()
+    if not payload:
+        return None
+
+    try:
+        data = json.loads(payload)
+        command_text = str(data.get("command", "")).strip()
+        return command_text or None
+    except Exception:
+        return None
+
+
+def execute_dox_command(command_text: str) -> dict:
+    from lib.lib import command
+
+    command_text = (command_text or "").strip()
+    if not command_text:
+        return {"ok": False, "command": "", "output": "空命令，未执行"}
+
+    # 防止递归进入 AI 命令网关
+    if command_text.startswith("?"):
+        return {"ok": False, "command": command_text, "output": "禁止执行 ? 命令"}
+
+    buf = io.StringIO()
+    try:
+        with redirect_stdout(buf):
+            command(command_text)
+        return {
+            "ok": True,
+            "command": command_text,
+            "output": buf.getvalue().strip(),
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "command": command_text,
+            "output": f"命令执行异常: {str(e)}",
+        }

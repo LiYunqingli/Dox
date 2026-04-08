@@ -1,7 +1,12 @@
 import json
 import requests
 from lib.lib import _print, get_config, get_run_path
-from lib.src.agent_tool_selector import parse_and_execute, build_tool_result_for_ai
+from lib.src.agent_tool_selector import (
+    parse_and_execute,
+    build_tool_result_for_ai,
+    extract_command_call,
+    execute_dox_command,
+)
 
 
 # 如果config.json中没有关于AI的配置，将调用函数里补充AI配置
@@ -141,3 +146,83 @@ def chat_cmd(input_str):
             except (KeyboardInterrupt, EOFError):
                 break
         _print("\n退出 Dox AI。\n", "yellow")
+
+
+def ai_run_cmd(input_str):
+    input_list = input_str.split(" ", 1)
+    if len(input_list) < 2 or not input_list[1].strip():
+        _print("请输入提示词，例如: ? 把语言切换为英文\n", "yellow")
+        return
+
+    user_prompt = input_list[1].strip()
+    config = get_config()
+
+    if "AI" not in config:
+        config["AI"] = {
+            "API_URL": "https://api.deepseek.com/chat/completions",
+            "API_KEY": "",
+            "Model": "deepseek-chat",
+        }
+        _save_config(config)
+
+    ai_config = config["AI"]
+    api_key = ai_config.get("API_KEY", "")
+    if not api_key:
+        _print("_67_\n_68_\n", "red")
+        _print(
+            "ps: set AI.API_KEY sk-xxxxx\nset AI.API_URL https://api.deepseek.com/chat/completions\nset AI.Model deepseek-chat\n",
+            "yellow",
+        )
+        _print("\n_69_\n", "yellow")
+        return
+
+    api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
+    model = ai_config.get("Model", "deepseek-chat")
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+
+    from lib.src.prompt import load_role_file, load_tool_prompt, load_help_prompt_for_ai
+
+    role_desc = ""
+    role_obj = load_role_file("dox")
+    if isinstance(role_obj, dict):
+        role_desc = str(role_obj.get("description", "")).strip()
+
+    cmd_prompt = load_tool_prompt("global_cmd")
+    help_doc = load_help_prompt_for_ai()
+
+    system_prompt = (
+        (role_desc + "\n\n" if role_desc else "")
+        + (cmd_prompt + "\n\n" if cmd_prompt else "")
+        + "以下是 Dox 帮助文档，请根据文档选择最合适的一条命令：\n"
+        + help_doc
+    ).strip()
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    try:
+        payload = {"model": model, "messages": messages, "stream": False}
+        response = requests.post(api_url, json=payload, headers=headers, timeout=30)
+        if response.status_code != 200:
+            _print(
+                f"[HTTP {response.status_code}] 接口调用异常: {response.text}\n", "red"
+            )
+            return
+        ai_text = response.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        _print(f"[Error] 请求出错: {str(e)}\n", "red")
+        return
+
+    cmd = extract_command_call(ai_text)
+    if not cmd:
+        _print("AI 未返回可执行命令，请检查提示词规范。\n", "yellow")
+        print(ai_text)
+        return
+
+    _print("[AI CMD] ", "cyan")
+    print(cmd)
+    result = execute_dox_command(cmd)
+    if result.get("output"):
+        print(result["output"])
