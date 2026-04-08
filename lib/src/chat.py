@@ -2,6 +2,7 @@ import os
 import json
 import requests
 from lib.lib import _print, get_config, get_run_path
+from lib.src.prompt import load_role_file
 
 
 # 如果config.json中没有关于AI的配置，将调用函数里补充AI配置
@@ -15,6 +16,7 @@ def chat_cmd(input_str):
     input_list = input_str.split(" ", 1)
     config = get_config()
 
+    # 硬编码到程序中，如果没有相关配置直接覆写
     if "AI" not in config:
         config["AI"] = {
             "API_URL": "https://api.deepseek.com/chat/completions",
@@ -28,11 +30,15 @@ def chat_cmd(input_str):
 
     if not api_key:
         _print(
-            "未找到 API_KEY。\n请在终端中使用命令配置，例如: set AI.API_KEY sk-xxxxx\n",
+            "_67_\n_68_\n",
             "red",
         )
         _print(
-            "你也可以设置免费的 DeepSeek、Kimi 或者本地 Ollama 的 API 信息。\n",
+            "ps: set AI.API_KEY sk-xxxxx\nset AI.API_URL https://api.deepseek.com/chat/completions\nset AI.Model deepseek-chat\n",
+            "yellow",
+        )
+        _print(
+            "\n_69_\n",
             "yellow",
         )
         return
@@ -40,6 +46,7 @@ def chat_cmd(input_str):
     api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
     model = ai_config.get("Model", "deepseek-chat")
 
+    # role = system 的意思是给ai设定角色背景信息以及行为准则
     messages = [
         {
             "role": "system",
