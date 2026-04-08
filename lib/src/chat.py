@@ -1,8 +1,7 @@
-import os
 import json
 import requests
 from lib.lib import _print, get_config, get_run_path
-from lib.src.prompt import load_role_file
+from lib.src.agent_tool_selector import parse_and_execute, build_tool_result_for_ai
 
 
 # 如果config.json中没有关于AI的配置，将调用函数里补充AI配置
@@ -57,8 +56,6 @@ def chat_cmd(input_str):
         }
     ]
 
-    print(messages[0]["content"])
-
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
     def ask_ai(msgs, stream=False):
@@ -100,13 +97,33 @@ def chat_cmd(input_str):
         except Exception as e:
             return f"[Error] 请求出错: {str(e)}"
 
+    def chat_once(user_text: str):
+        messages.append({"role": "user", "content": user_text})
+
+        # 第一轮：先拿完整回复，判断是否触发工具调用
+        first_answer = ask_ai(messages, stream=False)
+        messages.append({"role": "assistant", "content": first_answer})
+
+        tool_result = parse_and_execute(first_answer)
+        if tool_result is None:
+            # 无工具调用，直接输出AI首轮结果
+            _print("[Dox AI] ", "green")
+            print(first_answer)
+            return
+
+        # 有工具调用：把执行结果回注给AI，请它给最终自然语言答复
+        tool_feedback = build_tool_result_for_ai(tool_result)
+        messages.append({"role": "user", "content": tool_feedback})
+
+        _print("[Dox AI] ", "green")
+        final_answer = ask_ai(messages, stream=True)
+        messages.append({"role": "assistant", "content": final_answer})
+
     # 如果输入时带了参数 (例如: chat 你好) 进行单次问答
     if len(input_list) > 1:
         question = input_list[1].strip()
-        messages.append({"role": "user", "content": question})
         _print("Dox AI思考中...\n", "cyan")
-        _print("Dox AI:\n", "green")
-        ans = ask_ai(messages, stream=True)
+        chat_once(question)
         print("\n")
     else:
         # 进入交互式闲聊模式
@@ -119,10 +136,7 @@ def chat_cmd(input_str):
                     break
                 if not user_input:
                     continue
-                messages.append({"role": "user", "content": user_input})
-                _print("[Dox AI] ", "green")
-                ans = ask_ai(messages, stream=True)
-                messages.append({"role": "assistant", "content": ans})
+                chat_once(user_input)
 
             except (KeyboardInterrupt, EOFError):
                 break
