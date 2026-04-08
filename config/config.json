@@ -17,7 +17,7 @@
     },
     "AI": {
         "API_URL": "https://api.deepseek.com/chat/completions",
-        "API_KEY": "",
+        "API_KEY": "sk-f783b124caa94e0f9df4dcc04a927ac6",
         "Model": "deepseek-chat"
     }
 }
