@@ -124,9 +124,22 @@
             "name": "?",
             "msg": "?\t(convert natural language to a command and execute)",
             "usage": {
-                "? [prompt]": "Send prompt to AI; AI returns one Dox command and executes it immediately",
+                "? [prompt]": "Send prompt to AI; AI returns one or more Dox commands and executes them immediately",
                 "? switch language to English": "Typically generates and runs set Config.Lang en-US",
+                "? check path then list files": "May generate and run pwd; ls (multi-commands separated by semicolon)",
                 "? what files are in current directory": "Typically generates and runs ls"
+            }
+        },
+        {
+            "name": "CHAT",
+            "msg": "chat\t(AI chat with tool calls)",
+            "usage": {
+                "chat [question]": "Single-turn Q&A; AI can call Dox tools via tool protocol before answering",
+                "chat": "Enter interactive chat mode (type exit or quit to leave)",
+                "chat what files are in current directory": "AI may trigger tools like ls/ll/pwd/help/path/env/cd and then summarize",
+                "set AI.API_KEY sk-xxxxx": "Set AI API key",
+                "set AI.API_URL https://api.deepseek.com/chat/completions": "Set AI API URL",
+                "set AI.Model deepseek-chat": "Set AI model name"
             }
         },
         {

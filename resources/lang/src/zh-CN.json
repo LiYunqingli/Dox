@@ -124,9 +124,22 @@
             "name": "?",
             "msg": "?\t(将自然语言转换为命令并执行)",
             "usage": {
-                "? [提示词]": "将提示词发送给AI，AI返回一条Dox命令并立即执行",
+                "? [提示词]": "将提示词发送给AI，AI返回一条或多条Dox命令并立即执行",
                 "? 把语言切换为英文": "等价生成并执行 set Config.Lang en-US",
+                "? 先看路径再看文件": "可生成并执行 pwd; ls（用 ; 分隔多条命令）",
                 "? 当前目录下有什么文件": "等价生成并执行 ls"
+            }
+        },
+        {
+            "name": "CHAT",
+            "msg": "chat\t(AI 对话与工具调用)",
+            "usage": {
+                "chat [问题]": "单次问答模式，支持 AI 按工具协议调用 dox 工具后再回答",
+                "chat": "进入交互式对话模式（输入 exit 或 quit 退出）",
+                "chat 当前目录有什么文件": "AI 可自动触发 ls/ll/pwd/help/path/env/cd 等工具链再总结结果",
+                "set AI.API_KEY sk-xxxxx": "配置 AI 的 API KEY",
+                "set AI.API_URL https://api.deepseek.com/chat/completions": "配置 AI 接口地址",
+                "set AI.Model deepseek-chat": "配置 AI 模型名称"
             }
         },
         {
