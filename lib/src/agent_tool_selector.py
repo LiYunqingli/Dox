@@ -12,14 +12,22 @@ TOOL_CALL_START = "<DOX_TOOL_CALL>"
 TOOL_CALL_END = "</DOX_TOOL_CALL>"
 CMD_CALL_START = "<DOX_CMD_CALL>"
 CMD_CALL_END = "</DOX_CMD_CALL>"
-SUPPORTED_TOOLS = {"ls", "ll"}
+SUPPORTED_TOOLS = {
+    "ls",
+    "ll",
+    "pwd",
+    "help",
+    "path",
+    "env",
+    "cd",
+}
 
 
 def get_tool_protocol_prompt() -> str:
     return (
         "当你需要调用 Dox 工具时，请严格使用如下格式输出，不要添加多余解释：\n"
         '<DOX_TOOL_CALL>{"tool":"ls","args":"-a"}</DOX_TOOL_CALL>\n'
-        "可用 tool: ls, ll。args 可以为空字符串。"
+        "可用 tool: ls, ll, pwd, help, path, env, cd。args 可以为空字符串。"
     )
 
 
@@ -49,36 +57,23 @@ def extract_tool_call(ai_text: str) -> dict | None:
     return {"tool": tool, "args": args}
 
 
-def _exec_ls_like(tool: str, args: str) -> dict:
-    from lib.lib import ls_cmd
-
+def _exec_tool_command(tool: str, args: str) -> dict:
     cmd = f"{tool} {args}".strip()
-    buf = io.StringIO()
-    try:
-        with redirect_stdout(buf):
-            ls_cmd(cmd)
-        output = buf.getvalue().strip()
-        return {
-            "ok": True,
-            "tool": tool,
-            "command": cmd,
-            "output": output,
-        }
-    except Exception as e:
-        return {
-            "ok": False,
-            "tool": tool,
-            "command": cmd,
-            "output": f"工具执行异常: {str(e)}",
-        }
+    result = execute_dox_command(cmd)
+    return {
+        "ok": bool(result.get("ok")),
+        "tool": tool,
+        "command": cmd,
+        "output": str(result.get("output", "")),
+    }
 
 
 def execute_tool_call(call: dict) -> dict:
     tool = str(call.get("tool", "")).strip().lower()
     args = str(call.get("args", "")).strip()
 
-    if tool in {"ls", "ll"}:
-        return _exec_ls_like(tool, args)
+    if tool in SUPPORTED_TOOLS:
+        return _exec_tool_command(tool, args)
 
     return {
         "ok": False,
@@ -101,6 +96,7 @@ def build_tool_result_for_ai(exec_result: dict) -> str:
     output = exec_result.get("output", "")
     return (
         "以下是工具执行结果，请基于该结果用自然语言回答用户，不要再次输出工具调用标签。\n"
+        "说明：名称末尾带 / 表示目录，名称末尾带 @ 表示符号链接。\n"
         f"status: {status}\n"
         f"command: {command}\n"
         "output:\n"
@@ -189,3 +185,31 @@ def execute_dox_command(command_text: str) -> dict:
             "command": command_text,
             "output": f"命令执行异常: {str(e)}",
         }
+
+
+def execute_dox_commands(command_text: str) -> dict:
+    raw = (command_text or "").strip()
+    if not raw:
+        return {"ok": False, "commands": [], "output": "空命令，未执行"}
+
+    parts = [p.strip() for p in raw.split(";") if p.strip()]
+    if not parts:
+        return {"ok": False, "commands": [], "output": "空命令，未执行"}
+
+    rows = []
+    all_ok = True
+    for idx, cmd in enumerate(parts, start=1):
+        r = execute_dox_command(cmd)
+        ok = bool(r.get("ok"))
+        all_ok = all_ok and ok
+        out = str(r.get("output", "")).strip()
+        status = "OK" if ok else "ERROR"
+        rows.append(f"[{idx}] {status} {cmd}")
+        if out:
+            rows.append(out)
+
+    return {
+        "ok": all_ok,
+        "commands": parts,
+        "output": "\n".join(rows).strip(),
+    }

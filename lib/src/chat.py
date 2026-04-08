@@ -5,7 +5,7 @@ from lib.src.agent_tool_selector import (
     parse_and_execute,
     build_tool_result_for_ai,
     extract_command_call,
-    execute_dox_command,
+    execute_dox_commands,
 )
 
 
@@ -223,6 +223,6 @@ def ai_run_cmd(input_str):
 
     _print("[AI CMD] ", "cyan")
     print(cmd)
-    result = execute_dox_command(cmd)
+    result = execute_dox_commands(cmd)
     if result.get("output"):
         print(result["output"])
