@@ -14,5 +14,10 @@
     "Update": {
         "AutoCheck": true,
         "LatestVersionURL": "http://8.138.142.121/LiHuarong/Dox/raw/branch/main/latest_version"
+    },
+    "AI": {
+        "API_URL": "https://api.deepseek.com/chat/completions",
+        "API_KEY": "",
+        "Model": "deepseek-chat"
     }
 }

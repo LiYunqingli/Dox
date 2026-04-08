@@ -1249,6 +1249,9 @@ def command(input_str):
     elif command.lower() == "dox":
         path = get_run_path() + "/../resources/img/dox.png"
         img(f'img "{path}"')
+    elif command.lower() == "chat":
+        from lib.src.chat import chat_cmd
+        chat_cmd(input_str)
     else:
         _print("_2_" + command + "\n")
 
