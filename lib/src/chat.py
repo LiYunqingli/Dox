@@ -41,16 +41,39 @@ def chat_cmd(input_str):
         "Authorization": f"Bearer {api_key}"
     }
     
-    def ask_ai(msgs):
+    def ask_ai(msgs, stream=False):
         try:
             payload = {
                 "model": model,
-                "messages": msgs
+                "messages": msgs,
+                "stream": stream
             }
-            response = requests.post(api_url, json=payload, headers=headers, timeout=30)
+            response = requests.post(api_url, json=payload, headers=headers, timeout=30, stream=stream)
             if response.status_code == 200:
-                answer = response.json()["choices"][0]["message"]["content"]
-                return answer
+                if stream:
+                    full_answer = ""
+                    for line in response.iter_lines():
+                        if line:
+                            decoded_line = line.decode('utf-8')
+                            if decoded_line.startswith("data: "):
+                                data_str = decoded_line[6:]
+                                if data_str == "[DONE]":
+                                    break
+                                try:
+                                    data_json = json.loads(data_str)
+                                    if "choices" in data_json and len(data_json["choices"]) > 0:
+                                        delta = data_json["choices"][0].get("delta", {})
+                                        content = delta.get("content", "")
+                                        if content:
+                                            print(content, end="", flush=True)
+                                            full_answer += content
+                                except json.JSONDecodeError:
+                                    pass
+                    print()
+                    return full_answer
+                else:
+                    answer = response.json()["choices"][0]["message"]["content"]
+                    return answer
             else:
                 return f"[HTTP {response.status_code}] 接口调用异常: {response.text}"
         except Exception as e:
@@ -61,8 +84,9 @@ def chat_cmd(input_str):
         question = input_list[1].strip()
         messages.append({"role": "user", "content": question})
         _print("Dox AI思考中...\n", "cyan")
-        ans = ask_ai(messages)
-        _print(f"\nDox AI:\n{ans}\n\n", "green")
+        _print("Dox AI:\n", "green")
+        ans = ask_ai(messages, stream=True)
+        print("\n")
     else:
         # 进入交互式闲聊模式
         _print(">> 已进入 Dox AI 对话模式 (输入 exit 退出) <<\n", "cyan")
@@ -75,8 +99,8 @@ def chat_cmd(input_str):
                 if not user_input:
                     continue
                 messages.append({"role": "user", "content": user_input})
-                ans = ask_ai(messages)
-                _print(f"[Dox AI] {ans}\n", "green")
+                _print("[Dox AI] ", "green")
+                ans = ask_ai(messages, stream=True)
                 messages.append({"role": "assistant", "content": ans})
                 
             except (KeyboardInterrupt, EOFError):
