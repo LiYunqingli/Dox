@@ -102,27 +102,129 @@ def chat_cmd(input_str):
         except Exception as e:
             return f"[Error] 请求出错: {str(e)}"
 
+    def ask_ai_stream_with_tool_probe(msgs):
+        """单次流式请求：在流式接收时探测是否为工具调用标签。
+
+        - 如果是工具调用标签：不输出流式文本，仅返回完整内容。
+        - 如果是普通回答文本：实时流式输出并返回完整内容。
+        """
+        tool_prefix = "<DOX_TOOL_CALL>"
+        try:
+            payload = {"model": model, "messages": msgs, "stream": True}
+            response = requests.post(
+                api_url, json=payload, headers=headers, timeout=30, stream=True
+            )
+            if response.status_code != 200:
+                return (
+                    f"[HTTP {response.status_code}] 接口调用异常: {response.text}",
+                    False,
+                )
+
+            full_answer = ""
+            probe_buf = ""
+            mode = "unknown"  # unknown | tool | text
+            printed_prefix = False
+
+            for line in response.iter_lines():
+                if not line:
+                    continue
+                decoded_line = line.decode("utf-8")
+                if not decoded_line.startswith("data: "):
+                    continue
+
+                data_str = decoded_line[6:]
+                if data_str == "[DONE]":
+                    break
+
+                try:
+                    data_json = json.loads(data_str)
+                except json.JSONDecodeError:
+                    continue
+
+                if "choices" not in data_json or len(data_json["choices"]) == 0:
+                    continue
+
+                delta = data_json["choices"][0].get("delta", {})
+                content = delta.get("content", "")
+                if not content:
+                    continue
+
+                full_answer += content
+
+                if mode == "unknown":
+                    probe_buf += content
+                    probe = probe_buf.lstrip()
+
+                    if not probe:
+                        continue
+
+                    # 前缀仍可能匹配工具标签，继续等待更多字符
+                    if tool_prefix.startswith(probe):
+                        continue
+
+                    # 明确是工具调用
+                    if probe.startswith(tool_prefix):
+                        mode = "tool"
+                        continue
+
+                    # 非工具调用，切换到文本流式输出
+                    mode = "text"
+                    if not printed_prefix:
+                        _print("[Dox AI] ", "green")
+                        printed_prefix = True
+                    print(probe_buf, end="", flush=True)
+                    probe_buf = ""
+                    continue
+
+                if mode == "text":
+                    print(content, end="", flush=True)
+
+            if mode == "unknown":
+                # 流结束仍未判定：按最终文本决定
+                probe = probe_buf.lstrip()
+                if probe.startswith(tool_prefix):
+                    mode = "tool"
+                else:
+                    mode = "text"
+                    if probe_buf:
+                        _print("[Dox AI] ", "green")
+                        print(probe_buf, end="", flush=True)
+
+            if mode == "text":
+                print()
+
+            return full_answer, (mode == "tool")
+        except Exception as e:
+            return f"[Error] 请求出错: {str(e)}", False
+
     def chat_once(user_text: str):
         messages.append({"role": "user", "content": user_text})
 
-        # 第一轮：先拿完整回复，判断是否触发工具调用
-        first_answer = ask_ai(messages, stream=False)
-        messages.append({"role": "assistant", "content": first_answer})
+        # 支持多轮工具链：AI可连续调用工具，直到返回最终自然语言答案
+        max_tool_steps = 8
+        step = 0
 
-        tool_result = parse_and_execute(first_answer)
-        if tool_result is None:
-            # 无工具调用，直接输出AI首轮结果
-            _print("[Dox AI] ", "green")
-            print(first_answer)
-            return
+        while step < max_tool_steps:
+            step += 1
+            answer, is_tool = ask_ai_stream_with_tool_probe(messages)
+            messages.append({"role": "assistant", "content": answer})
 
-        # 有工具调用：把执行结果回注给AI，请它给最终自然语言答复
-        tool_feedback = build_tool_result_for_ai(tool_result)
-        messages.append({"role": "user", "content": tool_feedback})
+            if not is_tool:
+                return
 
+            tool_result = parse_and_execute(answer)
+            if tool_result is None:
+                # 兜底：若探测为工具但解析失败，按普通文本输出，避免吞消息
+                _print("[Dox AI] ", "green")
+                print(answer)
+                return
+
+            tool_feedback = build_tool_result_for_ai(tool_result)
+            messages.append({"role": "user", "content": tool_feedback})
+
+        # 超出最大工具调用轮次时，避免死循环
         _print("[Dox AI] ", "green")
-        final_answer = ask_ai(messages, stream=True)
-        messages.append({"role": "assistant", "content": final_answer})
+        print("工具调用次数过多，已中止本轮。请缩小问题范围后重试。")
 
     # 如果输入时带了参数 (例如: chat 你好) 进行单次问答
     if len(input_list) > 1:
