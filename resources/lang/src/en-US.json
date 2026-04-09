@@ -143,6 +143,17 @@
             }
         },
         {
+            "name": "&",
+            "msg": "&\t(LAN node discovery & P2P Remote Control)",
+            "usage": {
+                "& serve [device_name]": "Start listening in the current terminal to join the LAN cluster as a controlled node (default name is 'node')",
+                "& stop": "Stop the LAN listening service in the current terminal",
+                "& scan": "Send a UDP broadcast to scan all Dox nodes in the LAN that have enabled 'serve' and list their IPs and ports",
+                "& send <device_name> [-q] <command>": "Send a single command to a specified Dox node via TCP. By default, the remote node outputs the execution synchronously. Add '-q' for quiet/silent execution",
+                "& connect <device_name> [-q]": "Enter immersive remote control mode. Type 'exit' or '& disconnect' to quit. Add '-q' for quiet execution on the target node during this session"
+            }
+        },
+        {
             "name": "LS",
             "msg": "ls\t(list directory contents)",
             "usage": {
@@ -173,8 +184,15 @@
                 "pwd": "Show current directory path"
             }
         },
-        {
-            "name": "VERSION",
+        {            "name": "CAT",
+            "msg": "cat\t(view file content)",
+            "usage": {
+                "cat [file_name]": "Print the entire content of a file",
+                "cat [file_name] -head [lines]": "Print the first few lines of the file (or use -l instead)",
+                "cat [file_name] -tail [lines]": "Print the last few lines of the file"
+            }
+        },
+        {            "name": "VERSION",
             "msg": "version\t(show version information)",
             "usage": {
                 "version": "Display version number and release date"
