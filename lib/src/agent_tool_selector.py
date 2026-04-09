@@ -20,14 +20,26 @@ SUPPORTED_TOOLS = {
     "path",
     "env",
     "cd",
+    "cat",
 }
+
+
+def ai_action_log(action_type: str, cmd: str):
+    from lib.lib import _print
+
+    if action_type == "tool":
+        _print(f"\n[工具] : {cmd}\n", "magenta")
+    elif action_type == "cmd":
+        _print(f"\n[命令] : {cmd}\n", "cyan")
+    else:
+        _print(f"\n[未知] : {cmd}\n", "yellow")
 
 
 def get_tool_protocol_prompt() -> str:
     return (
         "当你需要调用 Dox 工具时，请严格使用如下格式输出，不要添加多余解释：\n"
         '<DOX_TOOL_CALL>{"tool":"ls","args":"-a"}</DOX_TOOL_CALL>\n'
-        "可用 tool: ls, ll, pwd, help, path, env, cd。args 可以为空字符串。"
+        "可用 tool: ls, ll, pwd, help, path, env, cd, cat。args 可以为空字符串。"
     )
 
 
@@ -59,7 +71,7 @@ def extract_tool_call(ai_text: str) -> dict | None:
 
 def _exec_tool_command(tool: str, args: str) -> dict:
     cmd = f"{tool} {args}".strip()
-    result = execute_dox_command(cmd)
+    result = execute_dox_command(cmd, is_tool=True)
     return {
         "ok": bool(result.get("ok")),
         "tool": tool,
@@ -73,8 +85,10 @@ def execute_tool_call(call: dict) -> dict:
     args = str(call.get("args", "")).strip()
 
     if tool in SUPPORTED_TOOLS:
+        ai_action_log("tool", f"{tool} {args}".strip())
         return _exec_tool_command(tool, args)
 
+    ai_action_log("tool", f"拦截到非法工具调用: {tool}")
     return {
         "ok": False,
         "tool": tool,
@@ -93,7 +107,13 @@ def parse_and_execute(ai_text: str) -> dict | None:
 def build_tool_result_for_ai(exec_result: dict) -> str:
     status = "ok" if exec_result.get("ok") else "error"
     command = exec_result.get("command", "")
-    output = exec_result.get("output", "")
+    output = str(exec_result.get("output", ""))
+    max_len = 4000
+    if len(output) > max_len:
+        output = (
+            output[:max_len]
+            + "\n... [输出过长已截断，若需要更多内容请继续调用工具读取具体片段]"
+        )
     return (
         "以下是工具执行结果，请基于该结果用自然语言回答用户，不要再次输出工具调用标签。\n"
         "说明：名称末尾带 / 表示目录，名称末尾带 @ 表示符号链接。\n"
@@ -142,6 +162,7 @@ def extract_command_call(ai_text: str) -> str | None:
             "version",
             "clear",
             "pck",
+            "cat",
         }
         if cmd_head in allowed:
             return first_line
@@ -159,7 +180,7 @@ def extract_command_call(ai_text: str) -> str | None:
         return None
 
 
-def execute_dox_command(command_text: str) -> dict:
+def execute_dox_command(command_text: str, is_tool: bool = False) -> dict:
     from lib.lib import command
 
     command_text = (command_text or "").strip()
@@ -169,6 +190,9 @@ def execute_dox_command(command_text: str) -> dict:
     # 防止递归进入 AI 命令网关
     if command_text.startswith("?"):
         return {"ok": False, "command": command_text, "output": "禁止执行 ? 命令"}
+
+    if not is_tool:
+        ai_action_log("cmd", command_text)
 
     buf = io.StringIO()
     try:
