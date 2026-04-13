@@ -52,11 +52,65 @@ def _udp_listener():
     sock.close()
 
 
+def _probe_nodes(timeout=2.0):
+    """探测局域网节点，返回 (nodes_map, names_set)"""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock.settimeout(timeout)
+
+    nodes = {}
+    names = set()
+    try:
+        sock.sendto("DOX_SCAN".encode("utf-8"), ("<broadcast>", UDP_PORT))
+
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                data, addr = sock.recvfrom(1024)
+                info = json.loads(data.decode("utf-8"))
+                name = info.get("name")
+                port = info.get("port")
+                if name and port:
+                    names.add(name)
+                    nodes[name] = (addr[0], port)
+            except socket.timeout:
+                break
+            except Exception:
+                pass
+    finally:
+        sock.close()
+
+    return nodes, names
+
+
+def _resolve_device_name(base_name):
+    """根据当前网络中已存在的名字，生成可用设备名"""
+    _, existing_names = _probe_nodes(timeout=1.2)
+
+    if base_name not in existing_names:
+        return base_name
+
+    idx = 1
+    while True:
+        candidate = f"{base_name}-{idx}"
+        if candidate not in existing_names:
+            return candidate
+        idx += 1
+
+
 def _tcp_listener():
     """监听TCP指令并执行"""
     global _run_server, _tcp_port
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    # 在 Windows 上使用独占绑定，避免同机多实例抢占同一个端口。
+    if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+        try:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        except Exception:
+            pass
+    elif hasattr(socket, "SO_REUSEADDR"):
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     port = TCP_PORT_START
     while port < TCP_PORT_START + 100:
@@ -151,7 +205,16 @@ def serve(device_name):
         _print("[Network] 错误：服务已在后台运行。\n", "red")
         return
 
-    _device_name = device_name
+    from lib.lib import _print
+
+    final_name = _resolve_device_name(device_name)
+    if final_name != device_name:
+        _print(
+            f"[Network] 名称 '{device_name}' 已被占用，已自动改为 '{final_name}'。\n",
+            "yellow",
+        )
+
+    _device_name = final_name
     _run_server = True
 
     threading.Thread(target=_udp_listener, daemon=True).start()
@@ -164,32 +227,15 @@ def scan():
 
     _print("[Network] 正在扫描局域网中的 Dox 节点...\n", "yellow")
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    sock.settimeout(2.0)
-
-    # 广播包
-    sock.sendto("DOX_SCAN".encode("utf-8"), ("<broadcast>", UDP_PORT))
-
     global _nodes_cache
     _nodes_cache.clear()
 
-    start_time = time.time()
-    while time.time() - start_time < 2.0:
-        try:
-            data, addr = sock.recvfrom(1024)
-            info = json.loads(data.decode("utf-8"))
-            name = info.get("name")
-            port = info.get("port")
-            if name and port:
-                _nodes_cache[name] = (addr[0], port)
-                _print(f"找到节点: {name} ({addr[0]}:{port})\n", "green")
-        except socket.timeout:
-            break
-        except Exception:
-            pass
+    nodes, _ = _probe_nodes(timeout=2.0)
+    _nodes_cache.update(nodes)
 
-    sock.close()
+    for name, (ip, port) in _nodes_cache.items():
+        _print(f"找到节点: {name} ({ip}:{port})\n", "green")
+
     if not _nodes_cache:
         _print("[Network] 未找到任何节点。\n", "red")
 
