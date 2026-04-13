@@ -209,14 +209,14 @@ def chat_cmd(input_str):
             answer, is_tool = ask_ai_stream_with_tool_probe(messages)
             messages.append({"role": "assistant", "content": answer})
 
-            if not is_tool:
-                return
-
+            # 兼容“自然语言 + 末尾工具调用标签”场景：
+            # 无论标签是否出现在开头，都尝试解析并执行。
             tool_result = parse_and_execute(answer)
             if tool_result is None:
-                # 兜底：若探测为工具但解析失败，按普通文本输出，避免吞消息
-                _print("[Dox AI] ", "green")
-                print(answer)
+                if is_tool:
+                    # 兜底：若探测为工具但解析失败，按普通文本输出，避免吞消息
+                    _print("[Dox AI] ", "green")
+                    print(answer)
                 return
 
             tool_feedback = build_tool_result_for_ai(tool_result)
