@@ -29,6 +29,12 @@ def get_config():
 # 获取main.py所在的路径
 def get_run_path():
     import os
+    import sys
+
+    # PyInstaller(onefile) 下，__file__ 指向 _MEI 临时目录。
+    # 返回 "<exe_dir>/lib" 可保持现有 "../config" "../resources" 相对路径逻辑不变。
+    if getattr(sys, "frozen", False):
+        return os.path.join(os.path.dirname(sys.executable), "lib")
 
     return os.path.dirname(os.path.abspath(__file__))
 

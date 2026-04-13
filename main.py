@@ -17,6 +17,8 @@ if sys.platform == "linux":
 
 
 def _script_dir() -> str:
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
     return str(Path(__file__).resolve().parent)
 
 
