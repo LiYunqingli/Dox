@@ -21,6 +21,7 @@ SUPPORTED_TOOLS = {
     "env",
     "cd",
     "cat",
+    "&",
 }
 
 
@@ -39,7 +40,7 @@ def get_tool_protocol_prompt() -> str:
     return (
         "当你需要调用 Dox 工具时，请严格使用如下格式输出，不要添加多余解释：\n"
         '<DOX_TOOL_CALL>{"tool":"ls","args":"-a"}</DOX_TOOL_CALL>\n'
-        "可用 tool: ls, ll, pwd, help, path, env, cd, cat。args 可以为空字符串。"
+        "可用 tool: ls, ll, pwd, help, path, env, cd, cat, &。args 可以为空字符串。如果你不懂命令的使用方法，可以先help [命令名]查看帮助"
     )
 
 
