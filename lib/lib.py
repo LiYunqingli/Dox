@@ -519,7 +519,9 @@ def pwd():
     """返回当前路径"""
     import os
 
-    _print("\n" + os.getcwd() + "\n\n")
+    path = os.getcwd()
+    _print("\n" + path + "\n\n")
+    return path
 
 
 def cat(input_str):
@@ -1208,6 +1210,11 @@ def command(input_str):
         from lib.src.chat import ai_run_cmd
 
         ai_run_cmd(input_str)
+    elif command == "sc":
+        # 脚本执行器
+        from lib.script import script_cmd
+
+        script_cmd(input_str)
     else:
         _print("_2_" + command + "\n")
 
