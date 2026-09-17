@@ -22,7 +22,6 @@ def _enable_virtual_terminal_processing() -> None:
         new_mode = mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
         kernel32.SetConsoleMode(handle, new_mode)
     except Exception:
-        # 尽力而为；如果失败，现代终端可能仍然能正常输出。
         return
 
 
