@@ -2,7 +2,8 @@
 Create at 2025.4.26 16:54:52 from Mr.LiHuarong
 """
 
-from lib.lib import load, _print, command  # ,  clear
+from lib.lib import load, _print  # ,  clear
+from lib.command import command
 import os
 import sys
 from pathlib import Path

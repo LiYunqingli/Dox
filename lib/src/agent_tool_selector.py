@@ -182,7 +182,7 @@ def extract_command_call(ai_text: str) -> str | None:
 
 
 def execute_dox_command(command_text: str, is_tool: bool = False) -> dict:
-    from lib.lib import command
+    from lib.command import command
 
     command_text = (command_text or "").strip()
     if not command_text:

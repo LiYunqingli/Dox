@@ -23,7 +23,7 @@ def check_script_is_dox(script_content):
 
 def check_and_format_script_path(path):
     import os
-    from lib.lib import pwd
+    from lib.src.pwd_cmd import pwd
 
     if not os.path.exists(path):
         if not os.path.exists(pwd() + "/" + path):

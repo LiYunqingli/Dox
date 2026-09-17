@@ -174,7 +174,7 @@ def _handle_tcp_client(client: socket.socket, addr):
         # 拦截stdout，执行命令
         import io
         from contextlib import redirect_stdout
-        from lib.lib import command
+        from lib.command import command
 
         f = io.StringIO()
         with redirect_stdout(f):
