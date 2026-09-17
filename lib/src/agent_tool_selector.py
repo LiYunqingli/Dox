@@ -21,6 +21,7 @@ SUPPORTED_TOOLS = {
     "env",
     "cd",
     "cat",
+    "cmd",
     "&",
 }
 
@@ -40,8 +41,22 @@ def get_tool_protocol_prompt() -> str:
     return (
         "当你需要调用 Dox 工具时，请严格使用如下格式输出，不要添加多余解释：\n"
         '<DOX_TOOL_CALL>{"tool":"ls","args":"-a"}</DOX_TOOL_CALL>\n'
-        "可用 tool: ls, ll, pwd, help, path, env, cd, cat, &。args 可以为空字符串。如果你不懂命令的使用方法，可以先help [命令名]查看帮助"
+        "可用 tool: ls, ll, pwd, help, path, env, cd, cat, cmd, &。args 可以为空字符串。"
+        "如果你不懂命令的使用方法，可以先help [命令名]查看帮助。\n"
+        "注意：cmd 用于执行系统终端命令，args 必须携带具体命令（如 "
+        '<DOX_TOOL_CALL>{"tool":"cmd","args":"dir"}</DOX_TOOL_CALL>），不要调用不带参数的 cmd。'
     )
+
+
+# 判断是否为“不带具体命令的 cmd”（即想进入系统终端交互模式）
+def _is_bare_cmd(command_text: str) -> bool:
+    parts = (command_text or "").strip().split(None, 1)
+    if not parts or parts[0].lower() != "cmd":
+        return False
+    rest = parts[1] if len(parts) > 1 else ""
+    # 去掉前置 --timeout 选项后仍为空，说明没有具体命令
+    rest = re.sub(r"^\s*--timeout(?:=|\s+)\d+\s*", "", rest)
+    return not rest.strip()
 
 
 def extract_tool_call(ai_text: str) -> dict | None:
@@ -118,6 +133,7 @@ def build_tool_result_for_ai(exec_result: dict) -> str:
     return (
         "以下是工具执行结果，请基于该结果用自然语言回答用户，不要再次输出工具调用标签。\n"
         "说明：名称末尾带 / 表示目录，名称末尾带 @ 表示符号链接。\n"
+        "说明：cmd 工具返回的是系统终端的原始输出文本，请依据其内容作答，不要臆造。\n"
         f"status: {status}\n"
         f"command: {command}\n"
         "output:\n"
@@ -164,6 +180,7 @@ def extract_command_call(ai_text: str) -> str | None:
             "clear",
             "pck",
             "cat",
+            "cmd",
         }
         if cmd_head in allowed:
             return first_line
@@ -191,6 +208,14 @@ def execute_dox_command(command_text: str, is_tool: bool = False) -> dict:
     # 防止递归进入 AI 命令网关
     if command_text.startswith("?"):
         return {"ok": False, "command": command_text, "output": "禁止执行 ? 命令"}
+
+    # 防止 AI 通道调用不带命令的 cmd，从而进入系统终端交互模式阻塞流程
+    if _is_bare_cmd(command_text):
+        return {
+            "ok": False,
+            "command": command_text,
+            "output": "禁止在 AI 通道中进入系统终端交互模式，请使用 cmd [命令] 执行单条命令",
+        }
 
     if not is_tool:
         ai_action_log("cmd", command_text)

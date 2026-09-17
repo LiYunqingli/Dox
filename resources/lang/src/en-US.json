@@ -74,7 +74,14 @@
         "66": "%s=%s",
         "67": "API_KEY not found.",
         "68": "Please configure it using commands in the terminal",
-        "69": "You can also set up free API information compatible with DeepSeek, Kimi, local Ollama, and other third-party APIs."
+        "69": "You can also set up free API information compatible with DeepSeek, Kimi, local Ollama, and other third-party APIs.",
+        "70": "Usage: cmd [--timeout <seconds>] [command]; without a command it opens the system shell",
+        "71": "Not an interactive terminal; cannot open the system shell. Use cmd [command] to run a single command instead",
+        "72": "Entered system shell (type exit to return to Dox)",
+        "73": "Left system shell, exit code: %s",
+        "74": "Command failed, exit code: %s",
+        "75": "Failed to start or run the system shell: %s",
+        "76": "Command timed out (%s s) and was terminated; use --timeout <seconds> for more time, 0 means unlimited"
     },
     "help": [
         {
@@ -113,6 +120,17 @@
             }
         },
         {
+            "name": "CMD",
+            "msg": "cmd\t(run system shell commands / open system shell)",
+            "usage": {
+                "cmd": "Enter the system shell interactively (type exit to return to Dox)",
+                "cmd [command]": "Run a single system command and echo its output, e.g. cmd dir",
+                "cmd --timeout [seconds] [command]": "Set the execution timeout; default 60 seconds, 0 means unlimited",
+                "cmd echo hello": "Example: run echo hello",
+                "cmd ping -n 2 127.0.0.1": "Example: run a system command with its own arguments (flags after the command are not consumed)"
+            }
+        },
+        {
             "name": "HELP",
             "msg": "help\t(print help information)",
             "usage": {
@@ -127,7 +145,8 @@
                 "? [prompt]": "Send prompt to AI; AI returns one or more Dox commands and executes them immediately",
                 "? switch language to English": "Typically generates and runs set Config.Lang en-US",
                 "? check path then list files": "May generate and run pwd; ls (multi-commands separated by semicolon)",
-                "? what files are in current directory": "Typically generates and runs ls"
+                "? what files are in current directory": "Typically generates and runs ls",
+                "? show my local IP configuration": "May generate and run cmd ipconfig (AI-generated cmd must carry a concrete command)"
             }
         },
         {
@@ -137,6 +156,7 @@
                 "chat [question]": "Single-turn Q&A; AI can call Dox tools via tool protocol before answering",
                 "chat": "Enter interactive chat mode (type exit or quit to leave)",
                 "chat what files are in current directory": "AI may trigger tools like ls/ll/pwd/help/path/env/cd and then summarize",
+                "chat how many python processes are running": "AI may call the cmd tool to run a system command (e.g. cmd tasklist) and then summarize",
                 "set AI.API_KEY sk-xxxxx": "Set AI API key",
                 "set AI.API_URL https://api.deepseek.com/chat/completions": "Set AI API URL",
                 "set AI.Model deepseek-chat": "Set AI model name"

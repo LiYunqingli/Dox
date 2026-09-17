@@ -98,6 +98,7 @@ python main.py -r "cd ..; ls; pwd"
 | `cd <path>` | 切换目录 |
 | `ls [-l]` / `ll` | 列目录（`-l` 详细信息） |
 | `pwd` | 输出当前路径 |
+| `cmd [--timeout N] [命令]` | 执行系统终端命令；不带命令则进入系统终端交互模式 |
 | `clear` | 清屏 |
 | `rm [-r] [-f] <path...>` | 删除文件/目录（`-r` 递归，`-f` 强制） |
 | `img <path/test> [-w N] [-h N] [--gray] [--no-color]` | 终端看图 |
@@ -129,7 +130,7 @@ python main.py -r "cd ..; ls; pwd"
 main.py                 入口（参数模式/交互模式）
 lib/lib.py              通用基础层（配置/路径/语言/多语言输出/通用工具 rm、download）
 lib/command.py          命令分发入口 command()
-lib/src/*_cmd.py        各命令实现（ls、cd、pwd、cat、help、img、video、pck、set、path、donghua）
+lib/src/*_cmd.py        各命令实现（ls、cd、pwd、cat、cmd、help、img、video、pck、set、path、donghua）
 lib/src/img.py          终端图片渲染（Pillow）
 lib/src/video.py        终端视频渲染（OpenCV + Pillow）
 lib/src/pck.py          pck 元数据相关逻辑

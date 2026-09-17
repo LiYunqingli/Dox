@@ -67,6 +67,10 @@ def command(input_str):
         from lib.src.cat_cmd import cat
 
         cat(input_str)
+    elif command.lower() == "cmd":
+        from lib.src.cmd_cmd import cmd_cmd
+
+        cmd_cmd(input_str)
     elif command.lower() == "help":
         from lib.src.help_cmd import help_cmd
 
