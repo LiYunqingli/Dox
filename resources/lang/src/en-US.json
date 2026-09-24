@@ -81,7 +81,31 @@
         "73": "Left system shell, exit code: %s",
         "74": "Command failed, exit code: %s",
         "75": "Failed to start or run the system shell: %s",
-        "76": "Command timed out (%s s) and was terminated; use --timeout <seconds> for more time, 0 means unlimited"
+        "76": "Command timed out (%s s) and was terminated; use --timeout <seconds> for more time, 0 means unlimited",
+        "78": "Usage: env [list|get|set|unset|clear|refresh] [args]; run help env for details",
+        "79": "Error: variable name cannot be empty",
+        "80": "Variable not found: %s",
+        "81": "Temporary variables (%s) (this session only):",
+        "82": "Persistent variables (%s) (from path.json):",
+        "83": "System variables (%s) (from config.json):",
+        "84": "Temporary variable set: %s=%s",
+        "85": "Persistent variable set: %s=%s (written to path.json)",
+        "86": "Variable removed: %s",
+        "87": "'%s' is a system variable (from config.json) and cannot be removed; use set %s <value> or env set %s <value> -s instead",
+        "88": "System variables refreshed: %s item(s) (from config.json)",
+        "89": "User variables refreshed: %s item(s) (from path.json and this session)",
+        "90": "Usage: env set <name> <value> [-p|--persist] [-s|--system]",
+        "91": "Usage: env unset <name> [path] [-t|--temp] [-p|--persist] [--all]",
+        "92": "Usage: env clear [-t|--temp] [-p|--persist] [--all]",
+        "93": "Temporary variables cleared",
+        "94": "Persistent variables cleared",
+        "96": "System variable written and synced to config.json: %s=%s",
+        "98": "Path already exists: %s",
+        "100": "  %s = %s",
+        "101": "source: temporary variable",
+        "102": "source: persistent variable",
+        "103": "source: system variable (config.json)",
+        "104": "source: system process environment"
     },
     "help": [
         {
@@ -276,21 +300,23 @@
             "name": "SET",
             "msg": "set\t(update Config)",
             "usage": {
-                "set [key] [value]": "Update root config in config.json (dot path supported, e.g. Config.Lang)",
+                "set [key] [value]": "Update root config in config.json (dot path supported, e.g. Config.Lang); system variables refresh immediately after writing",
                 "set Config.Lang en-US": "Switch language",
                 "set Config.Pck.Addr http://127.0.0.1:8081/": "Set pck server address",
+                "set Config.CmdTimeout 120": "Set default cmd execution timeout (seconds)",
                 "set AI.API_KEY sk-xxxxx": "Set AI API KEY"
             }
         },
         {
             "name": "PATH",
-            "msg": "path\t(manage PATH)",
+            "msg": "path\t(manage PATH, a user variable)",
             "usage": {
                 "path": "Show current PATH (merged temp + persistent)",
                 "path list": "List persistent/temp PATH entries",
                 "path add [dir]": "Add to persistent PATH (default)",
                 "path add [dir] -p": "Add to persistent PATH (writes path.json)",
                 "path add [dir] -t": "Add to temporary PATH (session only)",
+                "path add [dir] --all": "Add to both persistent and temporary PATH",
                 "path rm [dir]": "Remove from persistent PATH (default)",
                 "path rm [dir] -t": "Remove from temporary PATH",
                 "path rm [dir] --all": "Remove from both persistent and temporary",
@@ -301,11 +327,20 @@
         },
         {
             "name": "ENV",
-            "msg": "env\t(read environment variables)",
+            "msg": "env\t(environment variables: system / user)",
             "usage": {
-                "env": "Print PATH (merged temp + persistent)",
-                "env PATH": "Print PATH (same as above)",
-                "env [VAR]": "Print an environment variable (from process env)"
+                "env": "List all variables grouped as temporary, persistent and system",
+                "env list [-t|-p|-s|--all]": "List variables by scope (-t temp / -p persist / -s system / --all)",
+                "env [NAME]": "Show a variable value and its source (same as env get [NAME])",
+                "env set [NAME] [value]": "Set a temporary variable (this session only)",
+                "env set [NAME] [value] -p": "Set a persistent variable (writes config/path.json)",
+                "env set [NAME] [value] -s": "Write a system variable (updates config.json and refreshes)",
+                "env unset [NAME] [-t|-p|--all]": "Remove a user variable (default --all)",
+                "env clear [-t|-p|--all]": "Clear user variables (system variables untouched)",
+                "env refresh": "Reload config.json and path.json to refresh system and persistent variables",
+                "env set PATH [dir] -p": "Append a directory to persistent PATH (same as path add [dir] -p)",
+                "env path": "Show effective PATH (same as path show)",
+                "Note": "System variables come from config.json and load at startup; user variables are added via env/path. Priority: temp > persist > system > process environment"
             }
         }
     ]

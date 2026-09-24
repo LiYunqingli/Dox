@@ -118,7 +118,7 @@ def command(input_str):
 
         path_cmd(input_str)
     elif command.lower() == "env":
-        from lib.src.path_cmd import env_cmd
+        from lib.src.env_cmd import env_cmd
 
         env_cmd(input_str)
     elif command.lower() == "set":

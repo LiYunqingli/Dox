@@ -81,7 +81,31 @@
         "73": "已退出系统终端，退出码：%s",
         "74": "命令执行失败，退出码：%s",
         "75": "无法启动或执行系统终端：%s",
-        "76": "命令执行超时（%s 秒）已终止；如需更长时间请使用 --timeout <秒>，0 表示不限制"
+        "76": "命令执行超时（%s 秒）已终止；如需更长时间请使用 --timeout <秒>，0 表示不限制",
+        "78": "用法：env [list|get|set|unset|clear|refresh] [参数]，输入 help env 查看详情",
+        "79": "错误：变量名不能为空",
+        "80": "未找到变量：%s",
+        "81": "临时变量（%s）（仅本次会话有效）：",
+        "82": "永久变量（%s）（来自 path.json）：",
+        "83": "系统变量（%s）（来自 config.json）：",
+        "84": "已设置临时变量：%s=%s",
+        "85": "已设置永久变量：%s=%s（已写入 path.json）",
+        "86": "已删除变量：%s",
+        "87": "'%s' 是系统变量（来自 config.json），不可直接删除；请使用 set %s <值> 或 env set %s <值> -s 修改",
+        "88": "已刷新系统变量：%s 项（来源 config.json）",
+        "89": "已刷新用户变量：%s 项（来源 path.json 与本次会话）",
+        "90": "用法：env set <变量名> <值> [-p|--persist] [-s|--system]",
+        "91": "用法：env unset <变量名> [路径] [-t|--temp] [-p|--persist] [--all]",
+        "92": "用法：env clear [-t|--temp] [-p|--persist] [--all]",
+        "93": "已清空临时变量",
+        "94": "已清空永久变量",
+        "96": "已写入系统变量并同步到 config.json：%s=%s",
+        "98": "路径已存在：%s",
+        "100": "  %s = %s",
+        "101": "来源：临时变量",
+        "102": "来源：永久变量",
+        "103": "来源：系统变量（config.json）",
+        "104": "来源：系统进程环境变量"
     },
     "help": [
         {
@@ -276,21 +300,23 @@
             "name": "SET",
             "msg": "set\t(修改配置)",
             "usage": {
-                "set [key] [value]": "修改 config.json 根节点下的配置项（支持点号路径，如 Config.Lang）",
+                "set [key] [value]": "修改 config.json 根节点下的配置项（支持点号路径，如 Config.Lang），写入后立即刷新系统环境变量",
                 "set Config.Lang zh-CN": "切换语言为简体中文",
                 "set Config.Pck.Addr http://127.0.0.1:8081/": "设置 pck 服务器地址",
+                "set Config.CmdTimeout 120": "设置 cmd 命令的默认执行超时（秒）",
                 "set AI.API_KEY sk-xxxxx": "设置AI的API KEY标识"
             }
         },
         {
             "name": "PATH",
-            "msg": "path\t(PATH 环境变量管理)",
+            "msg": "path\t(PATH 环境变量管理，属于用户变量)",
             "usage": {
                 "path": "显示当前 PATH（临时+永久合并）",
                 "path list": "分别列出永久/临时 PATH 条目",
                 "path add [目录]": "添加到永久 PATH（默认）",
                 "path add [目录] -p": "添加到永久 PATH（写入 path.json）",
                 "path add [目录] -t": "添加到临时 PATH（仅本次会话）",
+                "path add [目录] --all": "同时添加到永久与临时 PATH",
                 "path rm [目录]": "从永久 PATH 删除（默认）",
                 "path rm [目录] -t": "从临时 PATH 删除",
                 "path rm [目录] --all": "同时从永久/临时删除",
@@ -301,11 +327,20 @@
         },
         {
             "name": "ENV",
-            "msg": "env\t(读取环境变量)",
+            "msg": "env\t(环境变量管理：系统变量 / 用户变量)",
             "usage": {
-                "env": "输出 PATH（临时+永久合并后的值）",
-                "env PATH": "输出 PATH（同上）",
-                "env [变量名]": "输出指定环境变量（读取系统进程环境）"
+                "env": "按 临时变量、永久变量、系统变量 三组列出全部变量",
+                "env list [-t|-p|-s|--all]": "按作用域列出变量（-t 临时 / -p 永久 / -s 系统 / --all 全部）",
+                "env [变量名]": "查看变量的值及其来源（等价于 env get [变量名]）",
+                "env set [变量名] [值]": "设置临时变量（仅本次会话有效）",
+                "env set [变量名] [值] -p": "设置永久变量（写入 config/path.json）",
+                "env set [变量名] [值] -s": "写入系统变量（同步修改 config.json 并刷新）",
+                "env unset [变量名] [-t|-p|--all]": "删除用户变量（默认 --all）",
+                "env clear [-t|-p|--all]": "清空用户变量（系统变量不受影响）",
+                "env refresh": "重新读取 config.json 与 path.json，刷新系统变量与永久变量",
+                "env set PATH [目录] -p": "向永久 PATH 追加目录（等同 path add [目录] -p）",
+                "env path": "查看 PATH 生效路径（等同 path show）",
+                "说明": "系统变量来自 config.json，进入 Dox 时自动载入；用户变量由 env/path 命令添加，优先级 临时 > 永久 > 系统 > 系统进程环境变量"
             }
         }
     ]

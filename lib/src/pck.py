@@ -1,4 +1,4 @@
-from lib.lib import _print, get_config, get_run_path, download
+from lib.lib import _print, get_config_value, get_run_path, download
 
 
 # pck软件包管理器
@@ -71,11 +71,9 @@ def pck_install(packages, ask=True):
 # 软件包依赖关系元数据更新
 def pck_update():
     _print("更新软件列表\n")
-    # 读取本地配置文件中的远程地址
-    config = get_config()
-    pckConfig = config["Config"]["Pck"]
-    pckName = pckConfig["Name"]
-    pckAddr = pckConfig["Addr"]
+    # 读取环境变量（系统变量）中的软件包服务配置
+    pckName = str(get_config_value("Config.Pck.Name", ""))
+    pckAddr = str(get_config_value("Config.Pck.Addr", ""))
 
     _print("Connecting  " + pckName + "  " + pckAddr + "\n")
 
@@ -91,7 +89,7 @@ def pck_update():
     if test_result.returncode == 0:
         _print("_14_\n", "green")
         # 服务器可到达
-        dox_version = config["About"]["Version"]
+        dox_version = str(get_config_value("About.Version", ""))
         releaseFile = f"{pckAddr}/metadata/{dox_version}/Release.json"
         dox_version_result = subprocess.run(
             ["curl", "-s", releaseFile],

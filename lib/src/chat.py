@@ -1,6 +1,7 @@
 import json
 import requests
-from lib.lib import _print, get_config, get_config_int, get_run_path
+from lib.lib import _print, get_config_int
+from lib import env
 from lib.src.agent_tool_selector import (
     parse_and_execute,
     build_tool_result_for_ai,
@@ -9,15 +10,27 @@ from lib.src.agent_tool_selector import (
 )
 
 
-# 默认AI服务地址与模型，仅用于配置文件缺失相关键时的兜底
+# 默认AI服务地址与模型，仅在 config.json 缺少对应配置项时作为兜底写入
 DEFAULT_API_URL = "https://api.deepseek.com/chat/completions"
 DEFAULT_MODEL = "deepseek-chat"
 
-# 若config.json中没有关于AI的配置，将调用函数里补充AI配置
-def _save_config(config):
-    config_file_path = get_run_path() + "/../config/config.json"
-    with open(config_file_path, "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=4, ensure_ascii=False)
+
+# 确保 config.json 中存在 AI 配置；缺失时写入默认值并刷新系统变量
+def _ensure_ai_config():
+    if env.get_config_value("AI.API_URL", None) is None:
+        env.update_config_items(
+            {
+                "AI.API_URL": DEFAULT_API_URL,
+                "AI.API_KEY": "",
+                "AI.Model": DEFAULT_MODEL,
+            }
+        )
+
+
+# 读取AI配置中的文本项（如 AI.API_KEY），缺失时回退默认值
+def _ai_str(key, default=""):
+    value = env.get_config_value(f"AI.{key}", None)
+    return default if value is None else str(value)
 
 
 # 读取AI配置中的整数项（如 AI.Timeout），缺失或非法时回退默认值
@@ -27,19 +40,9 @@ def _ai_int(key, default):
 
 def chat_cmd(input_str):
     input_list = input_str.split(" ", 1)
-    config = get_config()
 
-    # 硬编码到程序中，如果没有相关配置直接覆写
-    if "AI" not in config:
-        config["AI"] = {
-            "API_URL": DEFAULT_API_URL,
-            "API_KEY": "",
-            "Model": DEFAULT_MODEL,
-        }
-        _save_config(config)
-
-    ai_config = config["AI"]
-    api_key = ai_config.get("API_KEY", "")
+    _ensure_ai_config()
+    api_key = _ai_str("API_KEY")
 
     if not api_key:
         _print(
@@ -56,8 +59,8 @@ def chat_cmd(input_str):
         )
         return
 
-    api_url = ai_config.get("API_URL", DEFAULT_API_URL)
-    model = ai_config.get("Model", DEFAULT_MODEL)
+    api_url = _ai_str("API_URL", DEFAULT_API_URL)
+    model = _ai_str("Model", DEFAULT_MODEL)
 
     # 读取角色文件
     from lib.src.prompt import load_role_prompt
@@ -274,18 +277,9 @@ def ai_run_cmd(input_str):
         return
 
     user_prompt = input_list[1].strip()
-    config = get_config()
 
-    if "AI" not in config:
-        config["AI"] = {
-            "API_URL": DEFAULT_API_URL,
-            "API_KEY": "",
-            "Model": DEFAULT_MODEL,
-        }
-        _save_config(config)
-
-    ai_config = config["AI"]
-    api_key = ai_config.get("API_KEY", "")
+    _ensure_ai_config()
+    api_key = _ai_str("API_KEY")
     if not api_key:
         _print("_67_\n_68_\n", "red")
         _print(
@@ -295,8 +289,8 @@ def ai_run_cmd(input_str):
         _print("\n_69_\n", "yellow")
         return
 
-    api_url = ai_config.get("API_URL", DEFAULT_API_URL)
-    model = ai_config.get("Model", DEFAULT_MODEL)
+    api_url = _ai_str("API_URL", DEFAULT_API_URL)
+    model = _ai_str("Model", DEFAULT_MODEL)
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
     from lib.src.prompt import load_role_file, load_tool_prompt, load_help_prompt_for_ai

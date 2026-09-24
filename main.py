@@ -4,6 +4,7 @@ Create at 2025.4.26 16:54:52 from Mr.LiHuarong
 
 from lib.lib import load, _print  # ,  clear
 from lib.command import command
+from lib import env
 import os
 import sys
 from pathlib import Path
@@ -77,6 +78,9 @@ if __name__ == "__main__":
         _apply_start_cwd(default_mode)
     else:
         _apply_start_cwd(cwd_flag_mode)
+
+    # 进入 Dox 后读取 config.json，把配置项载入系统环境变量
+    env.init_env(keep_temp=False)
 
     # 检查是否存在 -r 参数
     if "-r" in args:

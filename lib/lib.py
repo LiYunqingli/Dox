@@ -5,9 +5,14 @@
 - 本文件只保留与具体命令无关的“通用语法”能力（路径/配置/语言/输出/通用文件与下载工具）；
 - 具体命令实现统一放在 lib/src/ 下；
 - 命令分发入口 command() 位于 lib/command.py，基础层不反向依赖业务层。
+
+配置读取说明：
+- config.json 的内容由 lib/env.py 在初始化时读入“系统变量”，业务代码一律通过
+  本文件的 get_config_value / get_config_int（内部转发到环境变量体系）读取配置，
+  不再直接打开配置文件；写回配置请使用 lib/env.py 的 set_config_value / save_config。
 """
 
-_config = None
+DEFAULT_LANG = "zh-CN"
 
 
 # 获取main.py所在的路径
@@ -23,41 +28,54 @@ def get_run_path():
     return os.path.dirname(os.path.abspath(__file__))
 
 
-# 获取配置文件的信息
+# 获取配置文件的信息（由系统环境变量重建，返回可安全修改的副本）
 def get_config():
-    global _config
-    if _config == None:
-        config_file_path = get_run_path() + "/../config/config.json"
-        import json
+    from lib import env
 
-        with open(config_file_path, "r", encoding="utf-8") as f:
-            _config = json.load(f)
-    return _config
+    return env.get_config()
 
 
 # 按点分路径读取配置（如 "AI.Max_tool_steps"），缺失时返回默认值
 def get_config_value(key_path, default=None):
-    node = get_config()
-    for seg in [s for s in str(key_path).split(".") if s]:
-        if not isinstance(node, dict) or seg not in node:
-            return default
-        node = node[seg]
-    return default if node is None else node
+    from lib import env
+
+    return env.get_config_value(key_path, default)
 
 
 # 读取整数配置，无法转换（缺失/空值/非数字）时回退默认值
 def get_config_int(key_path, default):
-    try:
-        return int(get_config_value(key_path, default))
-    except (TypeError, ValueError):
-        return default
+    from lib import env
+
+    return env.get_config_int(key_path, default)
 
 
 # 获取当前语言设置
 def get_lang():
-    config = get_config()
-    lang = config["Config"]["Lang"]
-    return lang
+    return str(get_config_value("Config.Lang", DEFAULT_LANG) or DEFAULT_LANG)
+
+
+# 读取语言包中的文案（不打印），用于需要拼接文本的场景
+def _msg(key, items=None):
+    import json
+    import re
+
+    lang = get_lang()
+    lang_file_path = f"{get_run_path()}/../resources/lang/src/{lang}.json"
+    try:
+        with open(lang_file_path, "r", encoding="utf-8") as f:
+            lang_data = json.load(f)["msg"]
+    except Exception:
+        return ""
+
+    text = lang_data.get(str(key))
+    if text is None:
+        return ""
+    if items:
+        try:
+            text = text % tuple(items)
+        except Exception:
+            pass
+    return text
 
 
 _VT_ENABLED = False
@@ -145,10 +163,12 @@ def _print(input_str="\n", color=None, items=[]):
         print(f"Error: {str(e)}")
 
 
-# 初始化控制台，载入信息
+# 初始化控制台，载入信息（同时读取 config.json 到系统环境变量）
 def load():
-    config = get_config()
-    version = config["About"]["Version"]
+    from lib import env
+
+    env.init_env(keep_temp=True)
+    version = str(get_config_value("About.Version", ""))
     _print("_0_[v" + version + "]\n")
     _print("_1_\n")
     _print()
@@ -156,8 +176,7 @@ def load():
 
 # 获取关于信息
 def get_about():
-    config = get_config()
-    about = config["About"]
+    about = get_config().get("About", {})
     return str(about)
 
 

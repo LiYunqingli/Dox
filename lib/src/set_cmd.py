@@ -1,6 +1,10 @@
-"""set 命令实现：按“点分路径”修改配置文件中的键值。"""
+"""set 命令实现：按“点分路径”修改配置文件中的键值。
 
-from lib.lib import _print, get_config, get_run_path
+写回 config.json 后会自动刷新系统环境变量，使修改立即生效。
+"""
+
+from lib.lib import _print
+from lib import env
 
 
 # 修改配置文件
@@ -49,7 +53,7 @@ def set_config(input_str):
     value_str = " ".join(parts[2:])
     new_value = parse_value(value_str)
 
-    config = get_config()
+    config = env.get_config()
     config_root = config
 
     segments = [seg for seg in key_path.split(".") if seg]
@@ -98,14 +102,10 @@ def set_config(input_str):
             parent = parent[seg]
 
         parent[final_key] = new_value
-        try:
-            config_file_path = get_run_path() + "/../config/config.json"
-            with open(config_file_path, "w", encoding="utf-8") as f:
-                json.dump(config, f, ensure_ascii=False, indent=4)
-                f.write("\n")
+        if env.save_config(config):
             _print("_42_\n", items=[key_path])
-        except Exception as e:
-            _print("_46_\n", "red", [str(e)])
+        else:
+            _print("_46_\n", "red", [key_path])
         return
 
     # 目标键已存在：展示新旧值并确认
@@ -119,11 +119,7 @@ def set_config(input_str):
         return
 
     parent[final_key] = new_value
-    try:
-        config_file_path = get_run_path() + "/../config/config.json"
-        with open(config_file_path, "w", encoding="utf-8") as f:
-            json.dump(config, f, ensure_ascii=False, indent=4)
-            f.write("\n")
+    if env.save_config(config):
         _print("_42_\n", items=[key_path])
-    except Exception as e:
-        _print("_46_\n", "red", [str(e)])
+    else:
+        _print("_46_\n", "red", [key_path])
