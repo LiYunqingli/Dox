@@ -124,7 +124,10 @@ def build_tool_result_for_ai(exec_result: dict) -> str:
     status = "ok" if exec_result.get("ok") else "error"
     command = exec_result.get("command", "")
     output = str(exec_result.get("output", ""))
-    max_len = 4000
+    # 工具回传给AI的最大输出长度，可在 config.json 的 AI.Max_tool_output_len 调整
+    from lib.lib import get_config_int
+
+    max_len = get_config_int("AI.Max_tool_output_len", 4000)
     if len(output) > max_len:
         output = (
             output[:max_len]

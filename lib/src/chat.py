@@ -1,6 +1,6 @@
 import json
 import requests
-from lib.lib import _print, get_config, get_run_path
+from lib.lib import _print, get_config, get_config_int, get_run_path
 from lib.src.agent_tool_selector import (
     parse_and_execute,
     build_tool_result_for_ai,
@@ -9,11 +9,20 @@ from lib.src.agent_tool_selector import (
 )
 
 
-# 如果config.json中没有关于AI的配置，将调用函数里补充AI配置
+# 默认AI服务地址与模型，仅用于配置文件缺失相关键时的兜底
+DEFAULT_API_URL = "https://api.deepseek.com/chat/completions"
+DEFAULT_MODEL = "deepseek-chat"
+
+# 若config.json中没有关于AI的配置，将调用函数里补充AI配置
 def _save_config(config):
     config_file_path = get_run_path() + "/../config/config.json"
     with open(config_file_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
+
+
+# 读取AI配置中的整数项（如 AI.Timeout），缺失或非法时回退默认值
+def _ai_int(key, default):
+    return get_config_int(f"AI.{key}", default)
 
 
 def chat_cmd(input_str):
@@ -23,9 +32,9 @@ def chat_cmd(input_str):
     # 硬编码到程序中，如果没有相关配置直接覆写
     if "AI" not in config:
         config["AI"] = {
-            "API_URL": "https://api.deepseek.com/chat/completions",
+            "API_URL": DEFAULT_API_URL,
             "API_KEY": "",
-            "Model": "deepseek-chat",
+            "Model": DEFAULT_MODEL,
         }
         _save_config(config)
 
@@ -47,8 +56,8 @@ def chat_cmd(input_str):
         )
         return
 
-    api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
-    model = ai_config.get("Model", "deepseek-chat")
+    api_url = ai_config.get("API_URL", DEFAULT_API_URL)
+    model = ai_config.get("Model", DEFAULT_MODEL)
 
     # 读取角色文件
     from lib.src.prompt import load_role_prompt
@@ -67,7 +76,11 @@ def chat_cmd(input_str):
         try:
             payload = {"model": model, "messages": msgs, "stream": stream}
             response = requests.post(
-                api_url, json=payload, headers=headers, timeout=30, stream=stream
+                api_url,
+                json=payload,
+                headers=headers,
+                timeout=_ai_int("Timeout", 30),
+                stream=stream,
             )
             if response.status_code == 200:
                 if stream:
@@ -112,7 +125,11 @@ def chat_cmd(input_str):
         try:
             payload = {"model": model, "messages": msgs, "stream": True}
             response = requests.post(
-                api_url, json=payload, headers=headers, timeout=30, stream=True
+                api_url,
+                json=payload,
+                headers=headers,
+                timeout=_ai_int("Timeout", 30),
+                stream=True,
             )
             if response.status_code != 200:
                 return (
@@ -201,7 +218,7 @@ def chat_cmd(input_str):
         messages.append({"role": "user", "content": user_text})
 
         # 支持多轮工具链：AI可连续调用工具，直到返回最终自然语言答案
-        max_tool_steps = 128
+        max_tool_steps = _ai_int("Max_tool_steps", 128)
         step = 0
 
         while step < max_tool_steps:
@@ -261,9 +278,9 @@ def ai_run_cmd(input_str):
 
     if "AI" not in config:
         config["AI"] = {
-            "API_URL": "https://api.deepseek.com/chat/completions",
+            "API_URL": DEFAULT_API_URL,
             "API_KEY": "",
-            "Model": "deepseek-chat",
+            "Model": DEFAULT_MODEL,
         }
         _save_config(config)
 
@@ -278,8 +295,8 @@ def ai_run_cmd(input_str):
         _print("\n_69_\n", "yellow")
         return
 
-    api_url = ai_config.get("API_URL", "https://api.deepseek.com/chat/completions")
-    model = ai_config.get("Model", "deepseek-chat")
+    api_url = ai_config.get("API_URL", DEFAULT_API_URL)
+    model = ai_config.get("Model", DEFAULT_MODEL)
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
     from lib.src.prompt import load_role_file, load_tool_prompt, load_help_prompt_for_ai
@@ -306,7 +323,12 @@ def ai_run_cmd(input_str):
 
     try:
         payload = {"model": model, "messages": messages, "stream": False}
-        response = requests.post(api_url, json=payload, headers=headers, timeout=30)
+        response = requests.post(
+            api_url,
+            json=payload,
+            headers=headers,
+            timeout=_ai_int("Timeout", 30),
+        )
         if response.status_code != 200:
             _print(
                 f"[HTTP {response.status_code}] 接口调用异常: {response.text}\n", "red"

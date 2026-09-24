@@ -35,6 +35,24 @@ def get_config():
     return _config
 
 
+# 按点分路径读取配置（如 "AI.Max_tool_steps"），缺失时返回默认值
+def get_config_value(key_path, default=None):
+    node = get_config()
+    for seg in [s for s in str(key_path).split(".") if s]:
+        if not isinstance(node, dict) or seg not in node:
+            return default
+        node = node[seg]
+    return default if node is None else node
+
+
+# 读取整数配置，无法转换（缺失/空值/非数字）时回退默认值
+def get_config_int(key_path, default):
+    try:
+        return int(get_config_value(key_path, default))
+    except (TypeError, ValueError):
+        return default
+
+
 # 获取当前语言设置
 def get_lang():
     config = get_config()

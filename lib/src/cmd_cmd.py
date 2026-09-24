@@ -13,9 +13,10 @@
 import re
 import sys
 
-from lib.lib import _print
+from lib.lib import _print, get_config_int
 
 # 单条命令的默认执行超时（秒），0 表示不限制
+# 可在 config.json 中通过 Config.CmdTimeout 覆盖，缺失时使用此兜底值
 DEFAULT_TIMEOUT = 60
 
 # 前置超时选项：--timeout 30 或 --timeout=30
@@ -123,8 +124,8 @@ def cmd_cmd(input_str):
     # 取 "cmd" 之后的原始内容，保留用户输入的引号与空格
     raw_rest = input_str.strip()[3:]
 
-    # 解析前置 --timeout 选项
-    timeout = DEFAULT_TIMEOUT
+    # 解析前置 --timeout 选项，未指定时取配置中的默认值
+    timeout = get_config_int("Config.CmdTimeout", DEFAULT_TIMEOUT)
     rest = raw_rest
     while True:
         m = _TIMEOUT_RE.match(rest)

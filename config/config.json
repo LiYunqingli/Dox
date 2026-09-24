@@ -9,7 +9,8 @@
             "Name": "Dox_pck_server",
             "Addr": "http://127.0.0.1:8081/"
         },
-        "RunStyle": "script"
+        "RunStyle": "script",
+        "CmdTimeout": 60
     },
     "Update": {
         "AutoCheck": true,
@@ -19,6 +20,8 @@
         "API_URL": "https://api.deepseek.com/chat/completions",
         "API_KEY": "sk-5ef738873b0e44d7ad735b83b36db5cf",
         "Model": "deepseek-chat",
-        "Max_tool_steps": "64"
+        "Timeout": 30,
+        "Max_tool_steps": 64,
+        "Max_tool_output_len": 4000
     }
 }
