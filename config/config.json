@@ -18,6 +18,7 @@
     "AI": {
         "API_URL": "https://api.deepseek.com/chat/completions",
         "API_KEY": "sk-5ef738873b0e44d7ad735b83b36db5cf",
-        "Model": "deepseek-chat"
+        "Model": "deepseek-chat",
+        "Max_tool_steps": "64"
     }
 }

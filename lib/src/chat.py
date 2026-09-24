@@ -201,7 +201,7 @@ def chat_cmd(input_str):
         messages.append({"role": "user", "content": user_text})
 
         # 支持多轮工具链：AI可连续调用工具，直到返回最终自然语言答案
-        max_tool_steps = 8
+        max_tool_steps = 128
         step = 0
 
         while step < max_tool_steps:
