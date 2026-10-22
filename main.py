@@ -2,9 +2,9 @@
 Create at 2025.4.26 16:54:52 from Mr.LiHuarong
 """
 
-from lib.lib import load, _print  # ,  clear
+from lib.core.base import load, _print  # ,  clear
 from lib.command import command
-from lib import env
+from lib.core import env
 import os
 import sys
 from pathlib import Path
