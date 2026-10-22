@@ -127,7 +127,7 @@ def _tcp_listener():
         return
 
     sock.listen(5)
-    from lib.lib import _print
+    from lib.core.base import _print
 
     _print(
         f"\n[Network] 本机服务已启动！设备名: '{_device_name}', IP: {_get_local_ip()}, 监听端口: {_tcp_port}\n",
@@ -167,7 +167,7 @@ def _handle_tcp_client(client: socket.socket, addr):
             pass
 
         if sync:
-            from lib.lib import _print
+            from lib.core.base import _print
 
             _print(f"\n[Remote Exec] {cmd}\n", "magenta")
 
@@ -200,12 +200,12 @@ def serve(device_name):
     """启动服务端"""
     global _device_name, _run_server
     if _run_server:
-        from lib.lib import _print
+        from lib.core.base import _print
 
         _print("[Network] 错误：服务已在后台运行。\n", "red")
         return
 
-    from lib.lib import _print
+    from lib.core.base import _print
 
     final_name = _resolve_device_name(device_name)
     if final_name != device_name:
@@ -223,7 +223,7 @@ def serve(device_name):
 
 def scan():
     """扫描局域网内的其它Dox设备"""
-    from lib.lib import _print
+    from lib.core.base import _print
 
     _print("[Network] 正在扫描局域网中的 Dox 节点...\n", "yellow")
 
@@ -272,7 +272,7 @@ def _send_command(node_name, cmd, sync=True) -> str:
 
 
 def send(node_name, cmd, sync=True):
-    from lib.lib import _print
+    from lib.core.base import _print
 
     if not cmd.strip():
         _print("发送的命令不能为空。\n", "red")
@@ -284,7 +284,7 @@ def send(node_name, cmd, sync=True):
 
 
 def connect(node_name, sync=True):
-    from lib.lib import _print
+    from lib.core.base import _print
 
     if node_name not in _nodes_cache:
         scan()
@@ -316,7 +316,7 @@ def connect(node_name, sync=True):
 def stop():
     """停止服务端监听"""
     global _run_server
-    from lib.lib import _print
+    from lib.core.base import _print
 
     if not _run_server:
         _print("[Network] 服务未在运行。\n", "yellow")
@@ -327,7 +327,7 @@ def stop():
 
 def network_cmd(input_str: str):
     """处理所有的 & 命令"""
-    from lib.lib import _print
+    from lib.core.base import _print
 
     parts = input_str.split(maxsplit=2)
     if len(parts) < 2:

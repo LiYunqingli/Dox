@@ -1,6 +1,6 @@
 """cat 命令实现：以文本方式显示文件内容，支持首尾截取。"""
 
-from lib.lib import _print
+from lib.core.base import _print
 
 
 def cat(input_str):

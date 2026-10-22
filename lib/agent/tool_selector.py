@@ -27,7 +27,7 @@ SUPPORTED_TOOLS = {
 
 
 def ai_action_log(action_type: str, cmd: str):
-    from lib.lib import _print
+    from lib.core.base import _print
 
     if action_type == "tool":
         _print(f"\n[工具] : {cmd}\n", "magenta")
@@ -125,7 +125,7 @@ def build_tool_result_for_ai(exec_result: dict) -> str:
     command = exec_result.get("command", "")
     output = str(exec_result.get("output", ""))
     # 工具回传给AI的最大输出长度，可在 config.json 的 AI.Max_tool_output_len 调整
-    from lib.lib import get_config_int
+    from lib.core.base import get_config_int
 
     max_len = get_config_int("AI.Max_tool_output_len", 4000)
     if len(output) > max_len:

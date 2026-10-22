@@ -23,7 +23,7 @@
 import json
 import os
 
-from lib.lib import get_run_path
+from lib.core.base import get_run_path
 
 # 作用域常量
 SCOPE_TEMP = "temp"  # 用户临时变量（仅当前进程）

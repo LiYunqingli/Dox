@@ -13,7 +13,7 @@
 import re
 import sys
 
-from lib.lib import _print, get_config_int
+from lib.core.base import _print, get_config_int
 
 # 单条命令的默认执行超时（秒），0 表示不限制
 # 可在 config.json 中通过 Config.CmdTimeout 覆盖，缺失时使用此兜底值

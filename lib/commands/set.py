@@ -3,8 +3,8 @@
 写回 config.json 后会自动刷新系统环境变量，使修改立即生效。
 """
 
-from lib.lib import _print
-from lib import env
+from lib.core.base import _print
+from lib.core import env
 
 
 # 修改配置文件

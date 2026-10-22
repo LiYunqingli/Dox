@@ -1,6 +1,6 @@
 """pwd 命令实现：输出当前工作路径。"""
 
-from lib.lib import _print
+from lib.core.base import _print
 
 
 # 输出当前工作路径

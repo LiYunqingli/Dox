@@ -17,8 +17,8 @@
     env path                  查看 PATH（等价于 path show）
 """
 
-from lib.lib import _print, _msg
-from lib import env
+from lib.core.base import _print, _msg
+from lib.core import env
 
 
 # 解析作用域开关，返回 all/persist/temp/system
@@ -202,7 +202,7 @@ def env_cmd(input_str):
 
     # path：等价于 path show（PATH 是列表型变量）
     if sub == "path":
-        from lib.src.path_cmd import path_cmd
+        from lib.commands.path import path_cmd
 
         path_cmd("path show")
         return

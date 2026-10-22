@@ -1,6 +1,6 @@
 """donghua 命令实现：输出彩色逐字随机色动画（彩蛋）。"""
 
-from lib.lib import get_run_path
+from lib.core.base import get_run_path
 
 
 # 加载动画

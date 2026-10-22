@@ -1,6 +1,6 @@
 """video 命令实现：解析参数后在终端播放视频（低分辨率渲染）。"""
 
-from lib.lib import _print, get_run_path
+from lib.core.base import _print, get_run_path
 
 
 # 指定一个路径在控制台播放视频
@@ -108,7 +108,7 @@ def video_cmd(input_str):
         return
 
     try:
-        from lib.src.video import video_in_cmd
+        from lib.commands.video_player import video_in_cmd
 
         video_in_cmd(
             path,

@@ -1,7 +1,7 @@
 """path 命令实现：PATH 条目的查看、增删与清空（临时 + 永久）。
 
 PATH 在 Dox 环境变量体系中属于“用户变量”，且是列表型变量：
-- 永久条目保存在 config/path.json，由 lib/env.py 统一读写；
+- 永久条目保存在 config/path.json，由 lib/core/env.py 统一读写；
 - 临时条目仅存在于当前进程，Dox 退出即丢失。
 
 用法：
@@ -12,8 +12,8 @@ PATH 在 Dox 环境变量体系中属于“用户变量”，且是列表型变�
     path clear [-p|-t|--all]
 """
 
-from lib.lib import _print
-from lib import env
+from lib.core.base import _print
+from lib.core import env
 
 
 def _parse_scope(flags, default=env.SCOPE_PERSIST):

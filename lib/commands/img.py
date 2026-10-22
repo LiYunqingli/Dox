@@ -1,6 +1,6 @@
 """img 命令实现：解析参数后在终端以低分辨率查看图片。"""
 
-from lib.lib import _print, get_run_path
+from lib.core.base import _print, get_run_path
 
 
 # 指定一个路径在控制台显示图片（低分辨率）
@@ -92,7 +92,7 @@ def img_cmd(input_str):
         _print("\n_7__5_\n\n")
         return
 
-    from lib.src.img import image_in_cmd
+    from lib.commands.image_viewer import image_in_cmd
 
     image_in_cmd(
         path,

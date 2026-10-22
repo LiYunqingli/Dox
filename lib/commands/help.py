@@ -1,6 +1,6 @@
 """help 命令实现：根据语言包输出帮助信息。"""
 
-from lib.lib import _print, get_run_path, get_lang
+from lib.core.base import _print, get_run_path, get_lang
 
 
 # 打印帮助信息（自动根据语言设置选择对应的语言包）

@@ -1,8 +1,8 @@
 import json
 import requests
-from lib.lib import _print, get_config_int
-from lib import env
-from lib.src.agent_tool_selector import (
+from lib.core.base import _print, get_config_int
+from lib.core import env
+from lib.agent.tool_selector import (
     parse_and_execute,
     build_tool_result_for_ai,
     extract_command_call,
@@ -63,7 +63,7 @@ def chat_cmd(input_str):
     model = _ai_str("Model", DEFAULT_MODEL)
 
     # 读取角色文件
-    from lib.src.prompt import load_role_prompt
+    from lib.agent.prompt import load_role_prompt
 
     # role = system 的意思是给ai设定角色背景信息以及行为准则
     messages = [
@@ -293,7 +293,7 @@ def ai_run_cmd(input_str):
     model = _ai_str("Model", DEFAULT_MODEL)
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
-    from lib.src.prompt import load_role_file, load_tool_prompt, load_help_prompt_for_ai
+    from lib.agent.prompt import load_role_file, load_tool_prompt, load_help_prompt_for_ai
 
     role_desc = ""
     role_obj = load_role_file("dox")

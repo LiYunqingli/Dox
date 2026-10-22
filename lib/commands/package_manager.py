@@ -1,4 +1,4 @@
-from lib.lib import _print, get_config_value, get_run_path, download
+from lib.core.base import _print, get_config_value, get_run_path, download
 
 
 # pck软件包管理器

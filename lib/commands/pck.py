@@ -1,6 +1,6 @@
 """pck 命令实现：软件包管理器的参数解析与子命令分发。"""
 
-from lib.lib import _print
+from lib.core.base import _print
 
 
 # 软件包管理器
@@ -11,7 +11,7 @@ def pck_cmd(input_str):
     else:
         if items[0] == "install":
             items = items[1:]
-            from lib.src.pck import pck_install
+            from lib.commands.package_manager import pck_install
 
             if len(items) == 0:
                 _print("_17_\n")  # 最少需要一个包名
@@ -22,7 +22,7 @@ def pck_cmd(input_str):
                 # 询问安装
                 pck_install(items, True)
         elif items[0] == "update":
-            from lib.src.pck import pck_update
+            from lib.commands.package_manager import pck_update
 
             items = items[1:]
             if len(items) != 0:
@@ -30,7 +30,7 @@ def pck_cmd(input_str):
             else:
                 pck_update()
         elif items[0] == "list":
-            from lib.src.pck import pck_list
+            from lib.commands.package_manager import pck_list
 
             items = items[1:]
             if len(items) != 0:
@@ -42,7 +42,7 @@ def pck_cmd(input_str):
             if len(items) == 0:
                 _print("_33_\n")
             else:
-                from lib.src.pck import pck_search
+                from lib.commands.package_manager import pck_search
 
                 pck_search(items[0], isOutPut=True)
         else:

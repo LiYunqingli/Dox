@@ -1,5 +1,5 @@
 # 脚本执行
-from lib.lib import _print
+from lib.core.base import _print
 
 
 def script_cmd(arg):
@@ -23,7 +23,7 @@ def check_script_is_dox(script_content):
 
 def check_and_format_script_path(path):
     import os
-    from lib.src.pwd_cmd import pwd
+    from lib.commands.pwd import pwd
 
     if not os.path.exists(path):
         if not os.path.exists(pwd() + "/" + path):

@@ -1,6 +1,6 @@
 def update():
-    from lib.lib import _print
-    from lib.lib import get_config_value
+    from lib.core.base import _print
+    from lib.core.base import get_config_value
     import requests
 
     local_version = str(get_config_value("About.Version", ""))

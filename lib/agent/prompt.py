@@ -21,7 +21,7 @@ def load_role_prompt(role_name):
 
 # 读取对应的agent角色文件，返回角色的对象
 def load_role_file(role_name):
-    from lib.lib import _print, get_run_path
+    from lib.core.base import _print, get_run_path
 
     role_file_path = get_run_path() + "/../resources/prompt/role/" + role_name + ".json"
     if not os.path.exists(role_file_path):
@@ -33,7 +33,7 @@ def load_role_file(role_name):
 
 
 def load_tool_prompt(prompt_name):
-    from lib.lib import _print, get_run_path
+    from lib.core.base import _print, get_run_path
 
     prompt_file_path = (
         get_run_path() + "/../resources/prompt/tool/" + prompt_name + ".json"
@@ -52,7 +52,7 @@ def load_tool_prompt(prompt_name):
 
 
 def load_help_prompt_for_ai() -> str:
-    from lib.lib import _print, get_lang, get_run_path
+    from lib.core.base import _print, get_lang, get_run_path
 
     lang = get_lang()
     lang_file_path = f"{get_run_path()}/../resources/lang/src/{lang}.json"

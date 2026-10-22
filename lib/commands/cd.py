@@ -1,6 +1,6 @@
 """cd 命令实现：切换当前工作目录。"""
 
-from lib.lib import _print
+from lib.core.base import _print
 
 
 # 进入一个新的目录

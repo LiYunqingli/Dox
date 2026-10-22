@@ -1,6 +1,6 @@
 """ls / ll 命令实现：增强版目录列表。"""
 
-from lib.lib import _print, _enable_virtual_terminal_processing
+from lib.core.base import _print, _enable_virtual_terminal_processing
 
 
 def ls_cmd(input_str: str) -> None:
