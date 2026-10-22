@@ -127,26 +127,29 @@ python main.py -r "cd ..; ls; pwd"
 ## 项目结构
 
 ```text
-main.py                 入口（参数模式/交互模式）
-lib/lib.py              通用基础层（配置/路径/语言/多语言输出/通用工具 rm、download）
-lib/command.py          命令分发入口 command()
-lib/src/*_cmd.py        各命令实现（ls、cd、pwd、cat、cmd、help、img、video、pck、set、path、donghua）
-lib/src/img.py          终端图片渲染（Pillow）
-lib/src/video.py        终端视频渲染（OpenCV + Pillow）
-lib/src/pck.py          pck 元数据相关逻辑
-lib/src/chat.py         AI 对话与工具调用
-lib/src/network.py      局域网节点发现与远程控制
-config/config.json      配置
-resources/lang/src/*    多语言消息与帮助
-package/Release.json    pck 元数据缓存
+main.py                      入口（参数模式/交互模式）
+lib/command.py               命令分发入口 command()（lib/ 下仅存放入口文件）
+lib/core/base.py             通用基础层（配置/路径/语言/多语言输出/通用工具 rm、download）
+lib/core/env.py              环境变量体系（系统/永久/临时三类作用域）
+lib/commands/*.py            终端命令代码库（ls、cd、pwd、cat、cmd、help、env、path、set、
+                             update、donghua、img、video、pck、script、network）
+lib/commands/image_viewer.py 终端图片渲染（Pillow）
+lib/commands/video_player.py 终端视频渲染（OpenCV + Pillow）
+lib/commands/package_manager.py pck 元数据相关逻辑
+lib/agent/chat.py            AI 对话与工具调用
+lib/agent/prompt.py          AI 角色/工具提示词加载
+lib/agent/tool_selector.py   AI 工具调用解析与执行
+config/config.json           配置
+resources/lang/src/*         多语言消息与帮助
+package/Release.json         pck 元数据缓存
 ```
 
 ## 贡献
 
 欢迎 PR / Issue。
 
-- 新命令：在 `lib/src/` 下新建 `<命令名>_cmd.py` 实现，再到 `lib/command.py` 的 `command()` 中挂上路由，并在语言包里补齐 help 文案
-- 只有与具体命令无关的“通用语法”才放进 `lib/lib.py`，避免基础层反向依赖业务模块
+- 新命令：在 `lib/commands/` 下新建 `<命令名>.py` 实现，再到 `lib/command.py` 的 `command()` 中挂上路由，并在语言包里补齐 help 文案
+- AI 相关代码放进 `lib/agent/`；只有与具体命令无关的“通用语法”才放进 `lib/core/base.py`，避免基础层反向依赖业务模块
 - 新增依赖请同步更新 `requirements.txt` 与本 README 的“依赖”章节
 
 
