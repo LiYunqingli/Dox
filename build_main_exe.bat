@@ -25,7 +25,9 @@ pyinstaller ^
   --specpath "%CD%\build" ^
   --paths "%CD%" ^
   --collect-submodules lib ^
-  --collect-submodules lib.src ^
+  --collect-submodules lib.core ^
+  --collect-submodules lib.commands ^
+  --collect-submodules lib.agent ^
   main.py
 
 if errorlevel 1 (
